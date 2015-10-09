@@ -1,5 +1,7 @@
 package productions.pa.zulugame.game.story.places;
 
+import productions.pa.zulugame.game.commands.Command;
+
 /**
  * Created by Andrey on 09.10.2015.
  */
@@ -14,7 +16,7 @@ public class PlaceExample extends AbstractStoryPlace {
     }
 
     @Override
-    String getStory() {
+    public String getStory() {
         return STORY;
     }
 
@@ -26,5 +28,10 @@ public class PlaceExample extends AbstractStoryPlace {
     @Override
     public String getDescription() {
         return DESCRIPTION;
+    }
+
+    @Override
+    public String executeCommand(Command command) {
+        return "";
     }
 }

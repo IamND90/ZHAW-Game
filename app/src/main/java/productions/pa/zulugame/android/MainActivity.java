@@ -107,4 +107,9 @@ public class MainActivity extends AppCompatActivity implements MessageCallback{
                 break;
         }
     }
+
+    @Override
+    public void clearScreen() {
+        textOutput.setText("");
+    }
 }

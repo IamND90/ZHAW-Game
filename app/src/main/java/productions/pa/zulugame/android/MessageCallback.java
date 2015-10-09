@@ -9,4 +9,5 @@ public interface MessageCallback {
     int RESULT_CODE_PARSER_FAIL = -1;
 
     void onMessageReceived(int resultCode, String message);
+    void clearScreen();
 }

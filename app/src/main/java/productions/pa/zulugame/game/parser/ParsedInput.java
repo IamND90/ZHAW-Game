@@ -3,6 +3,8 @@ package productions.pa.zulugame.game.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import productions.pa.zulugame.game.commands.Command;
+
 /**
  * Created by Andrey on 08.10.2015.
  */
@@ -26,31 +28,42 @@ public class ParsedInput {
     public List<HitWord> getAllHitwordsFound() {
         return myHitwordsFound;
     }
-    public List<HitWord> getAllNotFound() {
-        List<HitWord> hitwords = new ArrayList<>();
 
-        for(int i = 0; i< myHitwordsFound.size(); i ++){
-            if( myHitwordsFound.get(i).type.equals(HitWordType.NOT_FOUND)){
-                hitwords.add(myHitwordsFound.get(i));
+
+    public Command createCommand(){
+
+        // 0:command, 1: pointer, 2: attribute
+        HitWord command =null;
+        HitWord pointer = null;
+        HitWord attribute = null;
+        HitWordType type = HitWordType.UNKNOWN;
+
+        //Search Command
+        for(HitWord hitword : myHitwordsFound){
+            if(hitword.getType().equals(HitWordType.SUDO) ||hitword.getType().equals(HitWordType.MOVING) || hitword.getType().equals(HitWordType.ACTING)){
+                command = hitword;
+                type =  command.getType();
+                break;
             }
         }
-        return hitwords;
-    }
-
-    /**
-     * Removes all HitWords of type NOT_FOUND
-     * @return returns a new list from the original
-     * */
-    public List<HitWord> getRecognizedWordArray(){
-        List<HitWord> hitwords = new ArrayList<>();
-
-        for(int i = 0; i< myHitwordsFound.size(); i ++){
-            if( !myHitwordsFound.get(i).type.equals(HitWordType.NOT_FOUND)){
-                hitwords.add(myHitwordsFound.get(i));
+        //Search Pointer
+        for(HitWord hitword : myHitwordsFound){
+            if(hitword.getType().equals(HitWordType.POINTER)){
+                pointer = hitword;
+                if(type.equals(HitWordType.UNKNOWN))type = pointer.getType();
+                break;
             }
         }
-        return hitwords;
-    }
+        //Search Command
+        for(HitWord hitword : myHitwordsFound){
+            if(hitword.getType().equals(HitWordType.ITEM) || hitword.getType().equals(HitWordType.PLACE)){
+                attribute = hitword;
+                if(type.equals(HitWordType.UNKNOWN))type = attribute.getType();
+                break;
+            }
+        }
 
+        return new Command(type,command,pointer,attribute);
+    }
 
 }

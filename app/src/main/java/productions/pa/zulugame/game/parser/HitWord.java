@@ -5,14 +5,21 @@ package productions.pa.zulugame.game.parser;
  */
 public class HitWord {
 
-    int number =0;
-    String inputWord;
-    HitWordType type;
+    private int number =0;
+    private String inputWord;
+    private HitWordType type;
 
     public HitWord(String inputWord, HitWordType type){
         this.inputWord = inputWord;
         this.type = type;
     }
+
+    public HitWord(String inputWord, HitWordType type,int inputNumber){
+        this.inputWord = inputWord;
+        number = inputNumber;
+        this.type = type;
+    }
+
 
     public HitWord(int inputNumber){
         inputWord = ""+number;
@@ -25,7 +32,7 @@ public class HitWord {
     }
 
     public String getInputWord() {
-        return inputWord;
+        return inputWord == null ? "" : inputWord;
     }
 
     public HitWordType getType() {

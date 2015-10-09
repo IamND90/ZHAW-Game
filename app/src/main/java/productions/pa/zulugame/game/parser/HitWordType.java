@@ -5,11 +5,15 @@ package productions.pa.zulugame.game.parser;
  */
 public enum HitWordType {
 
+    SUDO,
+
     MOVING,
     ACTING,
     POINTER, //Like "at", "to", "from"
     NUMBER,
     ITEM,
+    PLACE,
 
+    UNKNOWN,
     NOT_FOUND
 }

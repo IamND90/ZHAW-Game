@@ -3,15 +3,16 @@ package productions.pa.zulugame.game.story.places;
 import java.util.ArrayList;
 import java.util.List;
 
-import productions.pa.zulugame.game.story.IModel;
+import productions.pa.zulugame.game.models.AbstractModel;
+import productions.pa.zulugame.game.models.IModel;
 import productions.pa.zulugame.game.story.StoryTree;
 
 /**
  * Created by Andrey on 08.10.2015.
  */
-public abstract class AbstractStoryPlace implements IModel {
+public abstract class AbstractStoryPlace extends AbstractModel {
 
-    private int id;
+
 
     final List<IModel> availableModels = new ArrayList<>();
 
@@ -23,20 +24,23 @@ public abstract class AbstractStoryPlace implements IModel {
     private final AbstractStoryPlace parentPlace;
 
 
-    public AbstractStoryPlace(int id,AbstractStoryPlace parent){
-        this.id = id;
+    public AbstractStoryPlace(int id, AbstractModel.TYPE type,AbstractStoryPlace parent){
+        super(id,type);
         parentPlace = parent;
     }
 
-    public int getId(){return id;}
 
+    public void addBranch(AbstractStoryPlace place){
+        nextPlaces.add(place);
+    }
 
     AbstractStoryPlace getPreviousPlace(){return parentPlace;}
-    AbstractStoryPlace getNextPlace(int index){
+    AbstractStoryPlace getPlaceAtIndex(int index){
         //if(index > 0 && index < nextPlaces.size())return nextPlaces.get(index);
-        return StoryTree.getPlaceAtId(id, index);
+        return StoryTree.get().getPlaceAtId(getId(), index);
     }
 
 
-    abstract String getStory();
+    public abstract String getStory();
+
 }

@@ -1,6 +1,6 @@
 package productions.pa.zulugame.game.story.places;
 
-import productions.pa.zulugame.game.parser.Command;
+import productions.pa.zulugame.game.commands.Command;
 
 /**
  * Created by Andrey on 09.10.2015.
@@ -13,13 +13,13 @@ public class PlaceStart extends AbstractStoryPlace {
     private static final String STORY = "This is the story..";
 
     public PlaceStart(int id, AbstractStoryPlace parent){
-        super(id, parent);
+        super(id,TYPE.ROOM, parent);
     }
 
 
 
     @Override
-    String getStory() {
+    public String getStory() {
         return STORY;
     }
 
@@ -34,8 +34,8 @@ public class PlaceStart extends AbstractStoryPlace {
     }
 
     @Override
-    public void executeCommand(Command command) {
-        switch (command.getmType()){
+    public String executeCommand(Command command) {
+        switch (command.getType()){
             case MOVING:
 
                 break;
@@ -53,5 +53,6 @@ public class PlaceStart extends AbstractStoryPlace {
                 break;
 
         }
+        return checkSubModels(command);
     }
 }

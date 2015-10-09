@@ -1,5 +1,8 @@
 package productions.pa.zulugame.game.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Andrey on 08.10.2015.
  */
@@ -26,7 +29,9 @@ public class Parser {
             // If the word if not found it will be added anyways, it as a type that is called NOT_FOUND for filtering later
             for (String word : words) {
                 HitWord foundHitword = HitWordFactory.findHitWord(word);
-                parsedInput[coms].addHitWord(foundHitword);
+                //Add to found array if it is a found word
+                if( !foundHitword.getType().equals(HitWordType.NOT_FOUND))
+                    parsedInput[coms].addHitWord(foundHitword);
             }
 
         }
