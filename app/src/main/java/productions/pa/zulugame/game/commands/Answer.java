@@ -7,13 +7,18 @@ public class Answer {
 
     String message;
 
-    Command command;
+    TYPE answerType[];
 
     int contextId =0;
     boolean isError = false;
 
+    public Answer(String message, TYPE... type){
+        this.message = message;
+        answerType = type;
+    }
     public Answer(String message){
         this.message = message;
+        answerType = new TYPE[]{TYPE.SIMPLE_OUTPUT};
     }
 
     public Answer setContextId(int id){
@@ -25,14 +30,6 @@ public class Answer {
     }
 
 
-    public Command getCommand() {
-        return command;
-    }
-
-    public Answer setCommand(Command command) {
-        this.command = command;
-        return this;
-    }
 
     public int getContextId() {
         return contextId;
@@ -42,8 +39,30 @@ public class Answer {
         return isError;
     }
 
+    public TYPE[] getAnswerTypes() {
+        return answerType;
+    }
+
+
     public Answer setIsError(boolean isError) {
         this.isError = isError;
         return this;
+    }
+
+    public boolean isFailAnswer(){
+        return (answerType[0].equals(TYPE.FAIL) ? true : false);
+    }
+    public enum TYPE{
+
+        ITEM_NOT_FOUND,
+        PLACE_NOT_FOUND,
+        SIMPLE_OUTPUT,
+
+        SUCCESS,
+        FAIL,
+
+        INTERACT,
+
+        MOVE_TO_PLACE
     }
 }

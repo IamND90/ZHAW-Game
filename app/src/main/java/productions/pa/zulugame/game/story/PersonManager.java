@@ -1,5 +1,7 @@
 package productions.pa.zulugame.game.story;
 
+import android.text.TextUtils;
+
 import productions.pa.zulugame.game.Game;
 import productions.pa.zulugame.game.models.Person;
 
@@ -33,6 +35,9 @@ public class PersonManager {
         return Game.getSharedPrefs().getString("username", "Dude");
     }
     public void saveUserName(String name){
-        Game.getSharedPrefs().edit().putString("username",name).commit();
+        if(!TextUtils.isEmpty(name) && name.length() >3) {
+            Game.getSharedPrefs().edit().putString("username", name).commit();
+            mPerson.setName(name);
+        }
     }
 }

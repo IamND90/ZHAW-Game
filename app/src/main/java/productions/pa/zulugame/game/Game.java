@@ -8,15 +8,17 @@ import java.util.List;
 
 import productions.pa.zulugame.android.InputCallback;
 import productions.pa.zulugame.android.UIHandler;
+import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
+import productions.pa.zulugame.game.models.places.APlace;
 import productions.pa.zulugame.game.parser.DialogFactory;
 import productions.pa.zulugame.game.parser.HitWord;
 import productions.pa.zulugame.game.parser.HitWordFactory;
 import productions.pa.zulugame.game.parser.HitWordType;
 import productions.pa.zulugame.game.parser.ParsedInput;
 import productions.pa.zulugame.game.parser.Parser;
+import productions.pa.zulugame.game.story.PersonManager;
 import productions.pa.zulugame.game.story.PlaceManager;
-import productions.pa.zulugame.game.models.places.AbstractStoryPlace;
 
 /**
  * Created by Andrey on 08.10.2015.
@@ -36,7 +38,7 @@ public class Game implements InputCallback {
     }
 
     public static SharedPreferences getSharedPrefs() {
-        return ((Activity)messageCallback).getSharedPreferences("sp",Context.MODE_PRIVATE);
+        return ((Activity) messageCallback).getSharedPreferences("sp", Context.MODE_PRIVATE);
     }
 
 
@@ -58,7 +60,7 @@ public class Game implements InputCallback {
         Command command = parsedInput.createCommand();
 
         // Check whether the command is defined or not
-        if(command.getType().equals(HitWordType.UNKNOWN)){
+        if (command.getType().equals(HitWordType.UNKNOWN)) {
             messageCallback.onErrorReceived(
                     "The command is not known: [" + parsedInput.getOriginalString() + "]");
             //Stop executing
@@ -72,35 +74,90 @@ public class Game implements InputCallback {
     private void processCommand(Command command) {
 
         //Process a help or info command
-        if (command.getType().equals(HitWordType.SUDO)) {
-            switch (command.getAction().getName()) {
-                case HitWordFactory.INFO:
-                    messageCallback.clearScreen();
-                    messageCallback.onMessageReceived(getCurrentInfo());
-                    break;
-                case HitWordFactory.HELP:
-                    //this functions creates a pop-up dialog and show the help message
-                    DialogFactory.createDialog((Context) messageCallback, DialogFactory.TITLE_HELP, MessageFactory.getHelpMessage());
-                    messageCallback.onMessageReceived("");
-                    break;
-                case HitWordFactory.START:
-                    startGame();
-                    break;
-            }
-            return;
+        switch (command.getType()) {
+            case SETTINGS:
+                if (command.getPointer() != null) {
+                    switch (command.getPointer().getString()){
+                        case HitWordFactory.NAME:
+                            if(command.getAttribute() != null) {
+                                PersonManager.get().saveUserName(command.getAttribute().getString());
+                                messageCallback.onMessageReceived("Your name has been changed to " + command.getAttribute().getString());
+                                return;
+                            }
+                            break;
+                    }
+                }
+                break;
+
+            case SUDO:
+                if (command.getAction() != null) {
+                    switch (command.getAction().getString()) {
+                        case HitWordFactory.INFO:
+                            messageCallback.clearScreen();
+                            messageCallback.onMessageReceived(getCurrentInfo());
+                            return;
+                        case HitWordFactory.HELP:
+                            //this functions creates a pop-up dialog and show the help message
+                            DialogFactory.createDialog((Context) messageCallback, DialogFactory.TITLE_HELP, MessageFactory.getHelpMessage());
+                            messageCallback.onMessageReceived("");
+                            return;
+                        case HitWordFactory.START:
+                            startGame();
+                            return;
+                    }
+                }
+                break;
+
         }
 
-        if(mStoryTree == null){
+
+        if (mStoryTree == null) {
             messageCallback.onMessageReceived(MessageFactory.MESSAGE_ENTER_START);
             return;
         }
 
-        AbstractStoryPlace place = mStoryTree.getCurrentPlace();
+        APlace place = mStoryTree.getCurrentPlace();
 
-        if(place != null) {
-            place.executeCommand(command);
+        if (place != null) {
+            Answer answer = place.executeCommand(command);
             //dummy
-            messageCallback.onMessageReceived("Some action :" + command.getString());
+            if(answer == null ){
+                messageCallback.onErrorReceived("Action not found: " + command.getString());
+                return;
+            }
+            if(answer.getAnswerTypes()[0] == Answer.TYPE.FAIL){
+                processFail(answer);
+
+                return;
+            }
+
+            processAnswer(answer);
+        }
+    }
+
+    private void processFail(Answer answer) {
+
+        if(answer.getAnswerTypes().length>1){
+            messageCallback.onMessageReceived(answer.getMessage());
+        }
+
+        messageCallback.onErrorReceived("Could not interact with the command");
+    }
+
+    private void processAnswer(Answer answer) {
+
+        for(Answer.TYPE commands: answer.getAnswerTypes()){
+            switch (commands){
+                case SIMPLE_OUTPUT:
+                    messageCallback.onMessageReceived(answer.getMessage());
+                    return;
+
+                case MOVE_TO_PLACE:
+                    if(PlaceManager.get().moveAtPlace(answer.getContextId())){
+                        messageCallback.onMessageReceived(answer.getMessage());
+                        return;
+                    }
+            }
         }
     }
 
@@ -108,15 +165,15 @@ public class Game implements InputCallback {
         //TODO
         mStoryTree = PlaceManager.get();
         messageCallback.clearScreen();
-        messageCallback.onMessageReceived( mStoryTree.getCurrentPlace().getStory());
+        messageCallback.onMessageReceived(mStoryTree.getCurrentPlace().getStory());
     }
 
 
     public String getCurrentInfo() {
         //TODO
-        if(mStoryTree == null)return MessageFactory.MESSAGE_ENTER_START;
-        AbstractStoryPlace place = mStoryTree.getCurrentPlace();
-        if(place != null){
+        if (mStoryTree == null) return MessageFactory.MESSAGE_ENTER_START;
+        APlace place = mStoryTree.getCurrentPlace();
+        if (place != null) {
             return place.getDescription();
         }
 

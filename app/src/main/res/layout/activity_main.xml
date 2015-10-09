@@ -8,7 +8,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:background="#59e3e2d6"
         android:id="@+id/scrollView" >
 
@@ -29,44 +29,30 @@
         android:background="#59e3e2d6"
         android:textColor="#d00900" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_height="60dp"
-        android:background="#59fcfbee">
 
-        <EditText
-            android:id="@+id/textInput"
-            android:text="@string/hello_world"
-            android:layout_weight="1"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_marginTop="10dp"
+            android:layout_height="50dp"
+            android:background="#59fcfbee">
 
-        <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
-            android:layout_margin="1dp"
-            android:id="@+id/imageButton"
-            android:src="@android:drawable/ic_menu_slideshow"
-            android:background="@android:color/transparent" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/textInput"
+                android:text="@string/hello_world"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/scrollView2" >
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:layout_margin="1dp"
+                android:id="@+id/imageButton"
+                android:src="@android:drawable/ic_menu_slideshow"
+                android:background="@android:color/transparent" />
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:padding="5dp"
-            android:text="Debuggerview"
-            android:id="@+id/debug"
-            android:background="#403d41"
-            android:textColor="#ffd645" />
-    </ScrollView>
 
 </LinearLayout>

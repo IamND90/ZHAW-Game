@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
 
     TextView textOutput;
     TextView textError;
-    TextView textDebug;
     EditText textInput;
     ImageButton buttonEnterCommand;
 
@@ -35,10 +34,9 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
         textOutput = (TextView) findViewById(R.id.textOutput);
         textInput = (EditText) findViewById(R.id.textInput);
         textError = (TextView) findViewById(R.id.textError);
-        textDebug = (TextView) findViewById(R.id.debug);
+
         buttonEnterCommand = (ImageButton) findViewById(R.id.imageButton);
 
-        Debugger.get().init(textDebug);
 
         myGame = new Game(this);
 
@@ -50,10 +48,8 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
         });
         textInput.setOnKeyListener(this);
 
-        if(!getSharedPreferences(SHAREDPREFS,MODE_PRIVATE).getBoolean(BOOL_OPEN_DEBUG,false)){
-            textDebug.setVisibility(View.GONE);
-        }
-        textError.setVisibility(View.GONE);
+
+
     }
 
     private void handleInput() {
@@ -80,14 +76,7 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            boolean openDebug = !getSharedPreferences(SHAREDPREFS,MODE_PRIVATE).getBoolean(BOOL_OPEN_DEBUG,false);
-            if(openDebug){
-                textDebug.setVisibility(View.VISIBLE);
-            }
-            else{
-                textDebug.setVisibility(View.GONE);
-            }
-            getSharedPreferences(SHAREDPREFS, MODE_PRIVATE).edit().putBoolean(BOOL_OPEN_DEBUG, openDebug).commit();
+
             return true;
         }
 

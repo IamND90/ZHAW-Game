@@ -26,6 +26,7 @@ public class Debugger {
     }
 
     public void append(String message){
+        if(output == null)return;
         String old = output.getText().toString();
         output.setText( old + "\n" + "#" + ++countDebugs + " " + message);
     }

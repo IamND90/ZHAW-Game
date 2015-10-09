@@ -13,7 +13,9 @@ public class MessageFactory {
 
     public static final String MESSAGE_BACKPACK_IS_EMPTY = "Your backpack is empty\n";
     public static final String MESSAGE_BACKPACK_DOES_NOT_HAS_ITEMS = "Your backpack does not has this item.\n";
+    public static final String MESSAGE_CANNOT_INTERACT = "Your backpack is empty\n";
 
+    public static final String MESSAGE_NO_KEY = "The door is close, you need to find a key first.\n";
 
     public static final String PLACEHOLDER_SUDO ="%arg1%";
     public static final String PLACEHOLDER_ACTIONS ="%arg2%";
@@ -27,6 +29,8 @@ public class MessageFactory {
             //PLACEHOLDER_ACTIONS+
             "\nFind more by trying. Good luck!\n"+
             "To change your name, type for example:\nname:Sweet";
+    public static final String DOOR_UNLOCKED = "The door has been unlocked";
+    public static final String ENTER_THE_PLACE = "You entered the place";
 
     public static String getHelpMessage(){
         String message = MESSAGE_HELP;

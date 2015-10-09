@@ -1,7 +1,10 @@
 package productions.pa.zulugame.game.story;
 
-import productions.pa.zulugame.game.models.places.AbstractStoryPlace;
+import productions.pa.zulugame.game.models.places.APlace;
+import productions.pa.zulugame.game.models.places.PlaceRoom1;
 import productions.pa.zulugame.game.models.places.PlaceStart;
+import productions.pa.zulugame.game.parser.Attribute;
+import productions.pa.zulugame.game.parser.HitWordFactory;
 
 /**
  * Created by Andrey on 09.10.2015.
@@ -10,11 +13,21 @@ public class PlaceManager {
 
     static PlaceManager mThis;
 
-    final AbstractStoryPlace myPlaces[] = {
-            new PlaceStart(1)
+
+
+    final APlace ROOM2 = new PlaceRoom1(2);
+    final APlace ROOM1 = new PlaceRoom1(1);
+
+    final APlace START = new PlaceStart(0)
+            .addBranch(ROOM1, new Attribute().setPointer(Attribute.POINTING.RIGHT).setStatus(Attribute.STATUS.CLOSED))
+            .addBranch(ROOM2, new Attribute().setPointer(Attribute.POINTING.LEFT));
+
+    final APlace myPlaces[] = {
+            START,
+            ROOM1
     };
 
-    AbstractStoryPlace currentPlace;
+    APlace currentPlace;
 
 
     private PlaceManager(){
@@ -31,13 +44,13 @@ public class PlaceManager {
         return mThis;
     }
 
-    public AbstractStoryPlace getPlaceAtId(int currentId, int moveToId){
+    public APlace getPlaceAtId(int currentId, int moveToId){
 
         return null;
     }
 
     public boolean moveAtPlace(int toPlaceId){
-        AbstractStoryPlace place = findPlaceFromCurrentPlace(toPlaceId);
+        APlace place = findPlaceFromCurrentPlace(toPlaceId);
         if(place == null) return false;
 
         currentPlace = place;
@@ -45,15 +58,15 @@ public class PlaceManager {
         return true;
     }
 
-    private AbstractStoryPlace findPlaceFromCurrentPlace(int id) {
-        for( AbstractStoryPlace nextPlace: currentPlace.getNextPlaces()){
+    private APlace findPlaceFromCurrentPlace(int id) {
+        for( APlace nextPlace: currentPlace.getNextPlaces()){
             if(nextPlace.getId() == id) return nextPlace;
         }
 
         return null;
     }
 
-    public AbstractStoryPlace getCurrentPlace() {
+    public APlace getCurrentPlace() {
         return currentPlace;
     }
 }

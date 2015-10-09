@@ -5,37 +5,15 @@ package productions.pa.zulugame.game.parser;
  */
 public class HitWordFactory {
 
-    enum ACTION_MOVING{
-        GO,
-        LEAVE,
-        MOVE,
-        WALK,
-        RUN,
-        TURN;
-
-    }
-    enum ACTION_ACTING{
-        OPEN,
-        CLOSE,
-        TAKE,
-        USE,
-        GET
-    }
-
-    enum ACTION_POINTING{
-        OPEN,
-        CLOSE,
-        TAKE,
-        USE,
-        GET
-    }
     //HELP AND ADMIN COMMANDS
     public static final String HELP = "help";
     public static final String INFO = "info";
     public static final String START = "start";
+    public static final String NAME = "name";
 
     //MOVING
     public static final String GO = "go";
+    public static final String ENTER = "enter";
     public static final String LEAVE = "leave";
     public static final String MOVE = "move";
     public static final String WALK = "walk";
@@ -43,8 +21,8 @@ public class HitWordFactory {
     public static final String TURN = "turn";
 
     //ACTING
-    public static final String OPEN = "open";
-    public static final String CLOSE = "close";
+    public static final String OPEN = Attribute.ACTING.OPEN.name();
+    public static final String CLOSE = Attribute.ACTING.CLOSE.name();
     public static final String TAKE = "take";
     public static final String USE = "use";
     public static final String GET = "get";
@@ -58,16 +36,17 @@ public class HitWordFactory {
     public static final String AT = "at";
     public static final String TO = "to";
     public static final String FROM = "from";
-    public static final String IN = "in";
-    public static final String OUT = "out";
+    public static final String IN = Attribute.POINTING.IN.name();
+    public static final String OUT = Attribute.POINTING.OUT.name();
     public static final String OF = "of";
     public static final String BY = "by";
     public static final String TROUGH = "trough";
-    public static final String FORWARD = "forward";
-    public static final String BACK = "back";
-    public static final String FRONT = "front";
-    public static final String LEFT = "left";
-    public static final String RIGHT = "right";
+    public static final String FORWARD = Attribute.POINTING.FORWARD.name();
+    public static final String BACK = Attribute.POINTING.BACK.name();
+    public static final String LEFT = Attribute.POINTING.LEFT.name();
+    public static final String RIGHT = Attribute.POINTING.RIGHT.name();
+
+
 
     //PLECES
     public static final String ROOM = "room";
@@ -80,6 +59,8 @@ public class HitWordFactory {
     //ITEMS
     public static final String ITEMS = "items";
     public static final String ITEM = "item";
+    public static final String ITEM_KEY = "KEY";
+
 
     public static final String HITWORDS_SUDO[] = {
             INFO,HELP,START
@@ -96,7 +77,7 @@ public class HitWordFactory {
     public static final String HITWORDS_POINTERS[] = {
             AT,TO,FROM,IN,OUT,OF,BY,
             TROUGH,FORWARD,BACK, RIGHT,
-            THIS,THE,FRONT,LEFT
+            THIS,THE,LEFT
     };
 
     public static final String HITWORDS_PLACES[] = {

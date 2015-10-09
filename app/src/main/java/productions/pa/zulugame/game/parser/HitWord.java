@@ -31,7 +31,7 @@ public class HitWord {
         return number;
     }
 
-    public String getName() {
+    public String getString() {
         return inputWord == null ? "" : inputWord;
     }
 

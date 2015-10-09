@@ -2,12 +2,13 @@ package productions.pa.zulugame.game.models;
 
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
+import productions.pa.zulugame.game.models.items.Item;
 import productions.pa.zulugame.game.story.ModelManager;
 
 /**
  * Created by IamND on 09.10.2015.
  */
-public class Person extends AbstractModel {
+public class Person extends AModel {
 
     static final String DESCRIPTION = "Person";
     String mName;
@@ -16,12 +17,16 @@ public class Person extends AbstractModel {
         super(ModelManager.ID_MYPERSON,TYPE.PERSON);
         mName = name;
 
-        subModels.add(new Backpack());
+        subItems.add(new Backpack());
     }
 
     @Override
     public String getName() {
         return mName;
+    }
+
+    public void setName(String mName) {
+        this.mName = mName;
     }
 
     @Override
@@ -38,5 +43,12 @@ public class Person extends AbstractModel {
         return checkSubModels(command);
     }
 
+    public Backpack getBackpack(){
+        return (Backpack) subItems.get(0);
+    }
 
+    @Override
+    public Answer interactWithItem(Item item) {
+        return null;
+    }
 }

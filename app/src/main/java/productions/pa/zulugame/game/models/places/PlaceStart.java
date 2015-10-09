@@ -1,14 +1,19 @@
 package productions.pa.zulugame.game.models.places;
 
+import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
+import productions.pa.zulugame.game.models.items.Door;
+import productions.pa.zulugame.game.models.items.Item;
+import productions.pa.zulugame.game.parser.Attribute;
 import productions.pa.zulugame.game.parser.HitWordFactory;
 import productions.pa.zulugame.game.story.PersonManager;
+import productions.pa.zulugame.game.story.PlaceManager;
 
 /**
  * Created by Andrey on 09.10.2015.
  */
-public class PlaceStart extends AbstractStoryPlace {
+public class PlaceStart extends APlace {
 
     private static final String NAME = "The Start of the Labyrinth";
     private static final String DESCRIPTION =
@@ -18,6 +23,8 @@ public class PlaceStart extends AbstractStoryPlace {
             "Maybe you can't remember " + PersonManager.get().getPerson().getName() + ", but you are already in the Matrix."+
             "You agreed to this experiment due to science and we have transplanted you conciousness before you died in this human-like biorobot."+
             "Explore the old world in your new body!";
+
+
 
     public PlaceStart(int id){
         super(id);
@@ -40,14 +47,10 @@ public class PlaceStart extends AbstractStoryPlace {
         return DESCRIPTION;
     }
 
+
+
     @Override
-    public Answer executeCommand(Command command) {
-        switch (command.getAction().getName()){
-            case HitWordFactory.OPEN:
-
-
-                break;
-        }
-        return checkSubModels(command);
+    public Answer interactWithItem(Item item) {
+        return new Answer(MessageFactory.MESSAGE_CANNOT_INTERACT, Answer.TYPE.FAIL);
     }
 }

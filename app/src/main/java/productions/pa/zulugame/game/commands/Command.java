@@ -9,15 +9,15 @@ import productions.pa.zulugame.game.parser.HitWordType;
 public class Command {
 
     HitWordType mType;
-    HitWord mAction= null;
-    HitWord mPointer=null;
-    HitWord mAttribute=null;
+    HitWord mAction;
+    HitWord mPointer;
+    HitWord mAttribute;
 
     public Command(HitWordType type, HitWord action, HitWord pointer, HitWord attribute){
-        mAction = action;
-        mPointer = pointer;
+        mAction = action == null ? new HitWord("",HitWordType.UNKNOWN) : action;
+        mPointer = pointer== null ? new HitWord("",HitWordType.UNKNOWN) : pointer;
         mType = type;
-        mAttribute = attribute;
+        mAttribute = attribute== null ? new HitWord("",HitWordType.UNKNOWN) : attribute;
     }
 
     public HitWord getPointer() {
@@ -39,9 +39,9 @@ public class Command {
     public String getString(){
         StringBuilder builder = new StringBuilder("[" + mType.name() + "]\t");
 
-        builder.append("Action: [" + (mAction== null ? "" : mAction.getName()) + "], ");
-        builder.append("Pointer: [" + (mPointer== null ? "" : mPointer.getName()) + "], ");
-        builder.append("Attribute: [" + (mAttribute== null ? "" : mAttribute.getName()) + "]");
+        builder.append("Action: [" + (mAction== null ? "" : mAction.getString()) + "], ");
+        builder.append("Pointer: [" + (mPointer== null ? "" : mPointer.getString()) + "], ");
+        builder.append("Attribute: [" + (mAttribute== null ? "" : mAttribute.getString()) + "]");
 
         return builder.toString();
     }

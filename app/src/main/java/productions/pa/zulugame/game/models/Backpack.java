@@ -10,13 +10,10 @@ import productions.pa.zulugame.game.story.ModelManager;
 /**
  * Created by IamND on 09.10.2015.
  */
-public class Backpack extends AbstractModel{
-
-
-
+public class Backpack extends Item {
 
     public Backpack() {
-        super(ModelManager.ID_BACKPACK,IModel.TYPE.ITEM);
+        super(ModelManager.ID_BACKPACK);
     }
 
     @Override
@@ -35,7 +32,7 @@ public class Backpack extends AbstractModel{
         if (command.getAction().equals(HitWordFactory.GET) || command.getAction().equals(HitWordFactory.USE)) {
             if(isEmpty()){return new Answer(MessageFactory.MESSAGE_BACKPACK_IS_EMPTY).setContextId(getId());}
             if(command.getAttribute() != null){
-                Item foundItem = getItem(-1,null,command.getAttribute().getName());
+                Item foundItem = getItem(-1,null,command.getAttribute().getString());
                 if(foundItem == null)return new Answer(MessageFactory.MESSAGE_BACKPACK_DOES_NOT_HAS_ITEMS).setContextId(getId());
 
                 ModelManager.get().setCurrentContext(this);
@@ -47,6 +44,11 @@ public class Backpack extends AbstractModel{
     }
 
     public boolean isEmpty() {
-        return subModels.isEmpty();
+        return !(interactItem == null && interactItem.length == 0);
+    }
+
+    @Override
+    public Answer interactWithItem(Item item) {
+        return null;
     }
 }
