@@ -1,5 +1,6 @@
 package productions.pa.zulugame.game.models;
 
+import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
 import productions.pa.zulugame.game.parser.HitWordFactory;
 import productions.pa.zulugame.game.parser.HitWordType;
@@ -8,8 +9,10 @@ import productions.pa.zulugame.game.parser.HitWordType;
  * Created by IamND on 09.10.2015.
  */
 public class Backpack extends AbstractModel{
+
+
     public Backpack() {
-        super(TYPE.ITEM);
+        super(ModelManager.ID_BACKPACK,IModel.TYPE.ITEM);
     }
 
     @Override
@@ -23,7 +26,7 @@ public class Backpack extends AbstractModel{
     }
 
     @Override
-    public String executeCommand(Command command) {
+    public Answer executeCommand(Command command) {
 
 
         if (command.getAction().equals(HitWordFactory.GET) || command.getAction().equals(HitWordFactory.USE)) {

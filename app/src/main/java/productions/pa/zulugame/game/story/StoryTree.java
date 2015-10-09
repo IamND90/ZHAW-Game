@@ -1,7 +1,7 @@
 package productions.pa.zulugame.game.story;
 
-import productions.pa.zulugame.game.story.places.AbstractStoryPlace;
-import productions.pa.zulugame.game.story.places.PlaceStart;
+import productions.pa.zulugame.game.models.places.AbstractStoryPlace;
+import productions.pa.zulugame.game.models.places.PlaceStart;
 
 /**
  * Created by Andrey on 09.10.2015.

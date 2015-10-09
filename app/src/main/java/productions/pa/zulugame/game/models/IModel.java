@@ -1,5 +1,6 @@
 package productions.pa.zulugame.game.models;
 
+import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
 
 /**
@@ -12,6 +13,13 @@ public interface IModel {
 
     /**
      * @return String that should be diplayed*/
-    String executeCommand(Command command);
+    Answer executeCommand(Command command);
 
+    enum TYPE{
+        UNKNOW,
+
+        ITEM,
+        PERSON,
+        PLACE
+    }
 }

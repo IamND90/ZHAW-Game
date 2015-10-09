@@ -1,4 +1,4 @@
-package productions.pa.zulugame.game.story.places;
+package productions.pa.zulugame.game.models.places;
 
 import java.util.ArrayList;
 import java.util.List;

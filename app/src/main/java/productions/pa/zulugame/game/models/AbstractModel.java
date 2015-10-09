@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
 
 /**
@@ -12,8 +13,8 @@ import productions.pa.zulugame.game.commands.Command;
  */
 public abstract class AbstractModel implements IModel {
 
-    private TYPE mType = TYPE.UNKNOW;
-    private int id;
+    private final TYPE mType;
+    private final int id;
 
     final List<AbstractModel> subModels = new ArrayList<>();
 
@@ -35,21 +36,47 @@ public abstract class AbstractModel implements IModel {
         return subModels;
     }
 
-    public enum TYPE{
-        UNKNOW,
 
-        ITEM,
-        PERSON,
-        ROOM
-    }
 
-    protected String checkSubModels(Command command){
-        String answer = null;
-        for(AbstractModel subModel: subModels){
-            answer = subModel.executeCommand(command);
-            if(!TextUtils.isEmpty(answer)) return answer;
+    protected AbstractModel getItem(int id, TYPE type, String name){
+        AbstractModel found = null;
+        if(id>0) {
+            for (AbstractModel subModel : subModels) {
+                if (subModel.getId() == id) {
+                    found = subModel;
+                    break;
+                }
+            }
         }
 
-        return "";
+        if(found != null && type != null) {
+            for (AbstractModel subModel : subModels) {
+                if (subModel.getType().equals(type)) {
+                    found = subModel;
+                    break;
+                }
+            }
+        }
+
+        if(found == null && !TextUtils.isEmpty(name)){
+            for (AbstractModel subModel : subModels) {
+                if (subModel.getName().equals(name)) {
+                    found = subModel;
+                    break;
+                }
+            }
+        }
+
+        return found;
+    }
+
+    protected Answer checkSubModels(Command command){
+        Answer answer = null;
+        for(AbstractModel subModel: subModels){
+            answer = subModel.executeCommand(command);
+            if(!TextUtils.isEmpty(answer.getMessage())) return answer;
+        }
+
+        return answer;
     }
 }

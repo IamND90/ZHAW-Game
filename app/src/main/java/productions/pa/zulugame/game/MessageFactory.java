@@ -14,12 +14,13 @@ public class MessageFactory {
     public static final String PLACEHOLDER_ACTIONS ="%arg2%";
     public static final String PLACEHOLDER_PLACES ="%arg3%";
 
-    private static final String MESSAGE_HELP = "Welcome to the help menu.\n"+
-            "Here are all the available commands:"+
+    private static final String MESSAGE_HELP =
+            "Here are some of the available commands:"+
             "\nGlobal help:\n"+
             PLACEHOLDER_SUDO+
             "\nActions:\n"+
-            PLACEHOLDER_ACTIONS;
+            PLACEHOLDER_ACTIONS+
+            "\nFind more by trying. Good luck!";
 
     public static String getHelpMessage(){
         String message = MESSAGE_HELP;

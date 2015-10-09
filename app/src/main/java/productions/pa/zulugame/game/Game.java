@@ -4,7 +4,6 @@ import android.content.Context;
 
 import java.util.List;
 
-import productions.pa.zulugame.android.Debugger;
 import productions.pa.zulugame.android.InputCallback;
 import productions.pa.zulugame.android.MessageCallback;
 import productions.pa.zulugame.game.commands.Command;
@@ -15,7 +14,7 @@ import productions.pa.zulugame.game.parser.HitWordType;
 import productions.pa.zulugame.game.parser.ParsedInput;
 import productions.pa.zulugame.game.parser.Parser;
 import productions.pa.zulugame.game.story.StoryTree;
-import productions.pa.zulugame.game.story.places.AbstractStoryPlace;
+import productions.pa.zulugame.game.models.places.AbstractStoryPlace;
 
 /**
  * Created by Andrey on 08.10.2015.
@@ -87,7 +86,7 @@ public class Game implements InputCallback {
         }
 
         if(mStoryTree == null){
-            messageCallback.onMessageReceived(MessageCallback.RESULT_CODE_OK,MessageFactory.MESSAGE_ENTER_START);
+            messageCallback.onMessageReceived(MessageCallback.RESULT_CODE_OK, MessageFactory.MESSAGE_ENTER_START);
             return;
         }
 

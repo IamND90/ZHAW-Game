@@ -2,6 +2,7 @@ package productions.pa.zulugame.game.models;
 
 import android.text.TextUtils;
 
+import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
 
 /**
@@ -13,7 +14,7 @@ public class Person extends AbstractModel {
     String mName;
 
     public Person(String name) {
-        super(TYPE.PERSON);
+        super(ModelManager.ID_MYPERSON,TYPE.PERSON);
         mName = name;
 
         subModels.add(new Backpack());
@@ -30,8 +31,8 @@ public class Person extends AbstractModel {
     }
 
     @Override
-    public String executeCommand(Command command) {
-        String answer = null;
+    public Answer executeCommand(Command command) {
+        Answer answer = null;
 
 
 

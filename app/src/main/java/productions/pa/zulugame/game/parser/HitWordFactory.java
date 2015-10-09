@@ -65,7 +65,9 @@ public class HitWordFactory {
     public static final String TROUGH = "trough";
     public static final String FORWARD = "forward";
     public static final String BACK = "back";
-    public static final String SIDE = "side";
+    public static final String FRONT = "front";
+    public static final String LEFT = "left";
+    public static final String RIGHT = "right";
 
     //PLECES
     public static final String ROOM = "room";
@@ -93,8 +95,8 @@ public class HitWordFactory {
 
     public static final String HITWORDS_POINTERS[] = {
             AT,TO,FROM,IN,OUT,OF,BY,
-            TROUGH,FORWARD,BACK,SIDE,
-            THIS,THE
+            TROUGH,FORWARD,BACK, RIGHT,
+            THIS,THE,FRONT,LEFT
     };
 
     public static final String HITWORDS_PLACES[] = {
