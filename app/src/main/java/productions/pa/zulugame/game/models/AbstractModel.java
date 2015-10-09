@@ -7,6 +7,7 @@ import java.util.List;
 
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
+import productions.pa.zulugame.game.models.items.Item;
 
 /**
  * Created by IamND on 09.10.2015.
@@ -28,17 +29,13 @@ public abstract class AbstractModel implements IModel {
         return id;
     }
 
-    public TYPE getmType() {
-        return mType;
-    }
-
     public List<AbstractModel> getSubModels() {
         return subModels;
     }
 
 
 
-    protected AbstractModel getItem(int id, TYPE type, String name){
+    protected Item getItem(int id, TYPE type, String name){
         AbstractModel found = null;
         if(id>0) {
             for (AbstractModel subModel : subModels) {
@@ -67,7 +64,7 @@ public abstract class AbstractModel implements IModel {
             }
         }
 
-        return found;
+        return (Item) found;
     }
 
     protected Answer checkSubModels(Command command){

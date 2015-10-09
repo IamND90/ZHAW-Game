@@ -6,6 +6,7 @@ package productions.pa.zulugame.game.parser;
 public enum HitWordType {
 
     SUDO,
+    SETTINGS,
 
     MOVING,
     ACTING,

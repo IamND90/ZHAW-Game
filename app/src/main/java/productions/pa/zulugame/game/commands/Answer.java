@@ -7,25 +7,43 @@ public class Answer {
 
     String message;
 
-    String parameters[];
+    Command command;
 
-    boolean isValid ;
+    int contextId =0;
+    boolean isError = false;
 
-    public Answer(boolean valid, String message, String parameters[]){
-        isValid = valid;
+    public Answer(String message){
         this.message = message;
-        this.parameters = parameters;
     }
 
+    public Answer setContextId(int id){
+        contextId = id;
+        return this;
+    }
     public String getMessage() {
         return message;
     }
 
-    public String[] getParameters() {
-        return parameters;
+
+    public Command getCommand() {
+        return command;
     }
 
-    public boolean isValid() {
-        return isValid;
+    public Answer setCommand(Command command) {
+        this.command = command;
+        return this;
+    }
+
+    public int getContextId() {
+        return contextId;
+    }
+
+    public boolean isError() {
+        return isError;
+    }
+
+    public Answer setIsError(boolean isError) {
+        this.isError = isError;
+        return this;
     }
 }

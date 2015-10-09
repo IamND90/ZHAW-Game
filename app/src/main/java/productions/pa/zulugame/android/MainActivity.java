@@ -3,6 +3,7 @@ package productions.pa.zulugame.android;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +14,7 @@ import android.widget.TextView;
 import productions.pa.zulugame.R;
 import productions.pa.zulugame.game.Game;
 
-public class MainActivity extends AppCompatActivity implements MessageCallback{
+public class MainActivity extends AppCompatActivity implements UIHandler,View.OnKeyListener {
 
     static final String SHAREDPREFS  = "sprefs";
     static final String BOOL_OPEN_DEBUG  = "debugopen";
@@ -44,17 +45,23 @@ public class MainActivity extends AppCompatActivity implements MessageCallback{
         buttonEnterCommand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Get the input string and ceck if its not empty
-                String text = textInput.getText().toString();
-                if(TextUtils.isEmpty(text)) return;
-
-                myGame.onInputString(text);
+                handleInput();
             }
         });
+        textInput.setOnKeyListener(this);
+
         if(!getSharedPreferences(SHAREDPREFS,MODE_PRIVATE).getBoolean(BOOL_OPEN_DEBUG,false)){
             textDebug.setVisibility(View.GONE);
         }
         textError.setVisibility(View.GONE);
+    }
+
+    private void handleInput() {
+        //Get the input string and ceck if its not empty
+        String text = textInput.getText().toString();
+        if(TextUtils.isEmpty(text)) return;
+
+        myGame.onInputString(text);
     }
 
     @Override
@@ -88,28 +95,51 @@ public class MainActivity extends AppCompatActivity implements MessageCallback{
     }
 
 
+
     @Override
-    public void onMessageReceived(int resultCode, String message) {
-        switch(resultCode){
-            case RESULT_CODE_OK:
-                String text = textOutput.getText().toString();
+    public void onMessageReceived(String message) {
+        String text = textOutput.getText().toString();
 
-                if(TextUtils.isEmpty(message))textOutput.setText("");
-                else
-                    textOutput.setText(text + "\n" + message);
+        if(TextUtils.isEmpty(message))textOutput.setText("");
+        else
+            textOutput.setText(text + "\n" + message);
 
-                textInput.setText("");
-                textError.setVisibility(View.GONE);
-                break;
-            case RESULT_CODE_PARSER_FAIL:
-                textError.setText(message);
-                textError.setVisibility(View.VISIBLE);
-                break;
-        }
+        textInput.setText("");
+        textError.setVisibility(View.GONE);
     }
 
     @Override
+    public void onErrorReceived(String message) {
+        textError.setText(message);
+        textError.setVisibility(View.VISIBLE);
+    }
+
+    /*
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if(keyCode == KeyEvent.KEYCODE_ENTER){
+            handleInput();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    */
+
+    @Override
     public void clearScreen() {
-        textOutput.setText("");
+        onMessageReceived(null);
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                (keyCode == KeyEvent.KEYCODE_ENTER)) {
+            // Perform action on key press
+            handleInput();
+            textInput.setText("");
+            return true;
+        }
+        return false;
     }
 }

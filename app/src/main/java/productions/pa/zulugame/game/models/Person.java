@@ -1,9 +1,8 @@
 package productions.pa.zulugame.game.models;
 
-import android.text.TextUtils;
-
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
+import productions.pa.zulugame.game.story.ModelManager;
 
 /**
  * Created by IamND on 09.10.2015.

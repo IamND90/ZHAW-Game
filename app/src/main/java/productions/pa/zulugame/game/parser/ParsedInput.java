@@ -40,6 +40,14 @@ public class ParsedInput {
 
         //Search Command
         for(HitWord hitword : myHitwordsFound){
+            if(hitword.getType().equals(HitWordType.SETTINGS) && myHitwordsFound.size() == 2){
+                return new Command(command.getType(),null,hitword,myHitwordsFound.get(1));
+            }
+        }
+
+
+        //Search Command
+        for(HitWord hitword : myHitwordsFound){
             if(hitword.getType().equals(HitWordType.SUDO) ||hitword.getType().equals(HitWordType.MOVING) || hitword.getType().equals(HitWordType.ACTING)){
                 command = hitword;
                 type =  command.getType();

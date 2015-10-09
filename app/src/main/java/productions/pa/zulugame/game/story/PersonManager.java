@@ -1,4 +1,7 @@
-package productions.pa.zulugame.game.models;
+package productions.pa.zulugame.game.story;
+
+import productions.pa.zulugame.game.Game;
+import productions.pa.zulugame.game.models.Person;
 
 /**
  * Created by IamND on 09.10.2015.
@@ -11,7 +14,7 @@ public class PersonManager {
 
     private PersonManager(){
         //TODO change name
-        mPerson = new Person("Dude");
+        mPerson = new Person(getUserName());
     }
     public static PersonManager get(){
         if(mThis == null){
@@ -24,5 +27,12 @@ public class PersonManager {
 
     public Person getPerson() {
         return mPerson;
+    }
+
+    public String getUserName() {
+        return Game.getSharedPrefs().getString("username", "Dude");
+    }
+    public void saveUserName(String name){
+        Game.getSharedPrefs().edit().putString("username",name).commit();
     }
 }

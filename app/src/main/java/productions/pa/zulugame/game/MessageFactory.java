@@ -7,8 +7,13 @@ import productions.pa.zulugame.game.parser.HitWordFactory;
  */
 public class MessageFactory {
 
-    public static final String MESSAGE_WELCOME_GAME = "Welcome!\nType 'start to start a game'.\nFor help type 'help'.\nAttenetion: The command input in NOT case sensitive";
+    public static final String MESSAGE_WELCOME_GAME = "Welcome!\nType 'start' to start a game.\nFor help type 'help'.\n"+
+            "Attenetion: The command input in NOT case sensitive";
     public static final String MESSAGE_ENTER_START = "Plase enter 'start' to start a new game.\n";
+
+    public static final String MESSAGE_BACKPACK_IS_EMPTY = "Your backpack is empty\n";
+    public static final String MESSAGE_BACKPACK_DOES_NOT_HAS_ITEMS = "Your backpack does not has this item.\n";
+
 
     public static final String PLACEHOLDER_SUDO ="%arg1%";
     public static final String PLACEHOLDER_ACTIONS ="%arg2%";
@@ -18,9 +23,10 @@ public class MessageFactory {
             "Here are some of the available commands:"+
             "\nGlobal help:\n"+
             PLACEHOLDER_SUDO+
-            "\nActions:\n"+
-            PLACEHOLDER_ACTIONS+
-            "\nFind more by trying. Good luck!";
+            //"\nActions:\n"+
+            //PLACEHOLDER_ACTIONS+
+            "\nFind more by trying. Good luck!\n"+
+            "To change your name, type for example:\nname:Sweet";
 
     public static String getHelpMessage(){
         String message = MESSAGE_HELP;

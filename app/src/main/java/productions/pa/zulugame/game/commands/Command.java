@@ -39,9 +39,9 @@ public class Command {
     public String getString(){
         StringBuilder builder = new StringBuilder("[" + mType.name() + "]\t");
 
-        builder.append("Action: [" + (mAction== null ? "" : mAction.getInputWord()) + "], ");
-        builder.append("Pointer: [" + (mPointer== null ? "" : mPointer.getInputWord()) + "], ");
-        builder.append("Attribute: [" + (mAttribute== null ? "" : mAttribute.getInputWord()) + "]");
+        builder.append("Action: [" + (mAction== null ? "" : mAction.getName()) + "], ");
+        builder.append("Pointer: [" + (mPointer== null ? "" : mPointer.getName()) + "], ");
+        builder.append("Attribute: [" + (mAttribute== null ? "" : mAttribute.getName()) + "]");
 
         return builder.toString();
     }
