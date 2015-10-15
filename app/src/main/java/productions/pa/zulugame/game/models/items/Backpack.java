@@ -1,8 +1,10 @@
-package productions.pa.zulugame.game.models;
+package productions.pa.zulugame.game.models.items;
 
 import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
+import productions.pa.zulugame.game.models.AModel;
+import productions.pa.zulugame.game.models.IModel;
 import productions.pa.zulugame.game.models.items.Item;
 import productions.pa.zulugame.game.parser.HitWordFactory;
 import productions.pa.zulugame.game.story.ModelManager;
@@ -32,7 +34,7 @@ public class Backpack extends Item {
     }
 
     @Override
-    public Answer executeCommand(Command command) {
+    public Answer processCommand(Command command) {
 
         if (command.getAction().equals(HitWordFactory.GET) || command.getAction().equals(HitWordFactory.USE)) {
             if(getSubItems().isEmpty()){return new Answer(MessageFactory.MESSAGE_BACKPACK_IS_EMPTY).setContextId(getId());}
@@ -68,7 +70,11 @@ public class Backpack extends Item {
 
     public int getSpaceUsed() {
         int space = 0;
-        for(Item item : getSubItems())space += item.getSpaceUsed();
+        for(IModel model : getSubItems()){
+            if(model.getType().equals(TYPE.ITEM)) {
+                space += ((Item) model).getSpaceUsed();
+            }
+        }
         return space;
     }
 }

@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Printer {
 
     static final int DELAY_MS = 6;
-    static final int DELAY_DOT_MS = 200;
-    static final int DELAY_NEW_LINE_MS = 360;
+    static final int DELAY_DOT_MS = 60;
+    static final int DELAY_NEW_LINE_MS = 160;
 
     final TextView outputView;
     final Activity activity;
@@ -66,15 +66,17 @@ public class Printer {
         if(!waitingString.isEmpty())waitingString.remove(0);
         isRunningTask.set(true);
         new Thread(new Runnable() {
-            char current = text.charAt(0);
+
             @Override
             public void run() {
+                if(text.length() == 0) return;
+                char current = text.charAt(0);
                 while(currentIndex < textLenght){
-                    if(timePassed >= ((current != '\n' || current != '.') ? (current == '.' ? DELAY_DOT_MS : DELAY_NEW_LINE_MS) : DELAY_MS)){
-                        String next = text.substring(0,currentIndex++);
+                    if(timePassed >= ((current == '\n' || current == '.') ? (current == '.' ? DELAY_DOT_MS : DELAY_NEW_LINE_MS) : DELAY_MS)){
+                        String next = text.substring(0,currentIndex);
                         setText(next);
                         lastTime = System.currentTimeMillis();
-                        current = text.charAt(currentIndex);
+                        current = text.charAt(currentIndex++);
                     }
 
                     timePassed = System.currentTimeMillis() -lastTime;

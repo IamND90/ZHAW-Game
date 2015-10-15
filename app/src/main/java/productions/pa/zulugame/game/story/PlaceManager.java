@@ -1,8 +1,10 @@
 package productions.pa.zulugame.game.story;
 
+import productions.pa.zulugame.game.models.items.Door;
 import productions.pa.zulugame.game.models.places.APlace;
 import productions.pa.zulugame.game.models.places.PlaceRoom1;
 import productions.pa.zulugame.game.models.places.PlaceStart;
+import productions.pa.zulugame.game.models.places.Room;
 import productions.pa.zulugame.game.parser.Attribute;
 import productions.pa.zulugame.game.parser.HitWordFactory;
 
@@ -15,19 +17,20 @@ public class PlaceManager {
 
 
 
-    final APlace ROOM2 = new PlaceRoom1(2);
-    final APlace ROOM1 = new PlaceRoom1(1);
+    final Room ROOM2 = new PlaceRoom1(2);
+    final Room ROOM1 = new PlaceRoom1(1);
 
-    final APlace START = new PlaceStart(0)
+    final Room START = new PlaceStart(0)
             .addBranch(ROOM1, new Attribute().setPointer(Attribute.POINTING.RIGHT).setStatus(Attribute.STATUS.CLOSED))
             .addBranch(ROOM2, new Attribute().setPointer(Attribute.POINTING.LEFT));
 
-    final APlace myPlaces[] = {
+    final Room myPlaces[] = {
             START,
-            ROOM1
+            ROOM1,
+            ROOM2
     };
 
-    APlace currentPlace;
+    Room currentPlace;
 
 
     private PlaceManager(){
@@ -50,7 +53,7 @@ public class PlaceManager {
     }
 
     public boolean moveAtPlace(int toPlaceId){
-        APlace place = findPlaceFromCurrentPlace(toPlaceId);
+        Room place = findPlaceFromCurrentPlace(toPlaceId);
         if(place == null) return false;
 
         currentPlace = place;
@@ -58,15 +61,15 @@ public class PlaceManager {
         return true;
     }
 
-    private APlace findPlaceFromCurrentPlace(int id) {
-        for( APlace nextPlace: currentPlace.getNextPlaces()){
-            if(nextPlace.getId() == id) return nextPlace;
+    private Room findPlaceFromCurrentPlace(int id) {
+        for( Door nextPlace: currentPlace.getLinkedDoors()){
+            if(nextPlace.getNextPlace().getId() == id) return nextPlace.getNextPlace();
         }
 
         return null;
     }
 
-    public APlace getCurrentPlace() {
+    public Room getCurrentPlace() {
         return currentPlace;
     }
 }

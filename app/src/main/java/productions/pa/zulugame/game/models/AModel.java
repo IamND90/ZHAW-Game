@@ -19,31 +19,45 @@ public abstract class AModel implements IModel {
 
     private final TYPE mType;
     private final int id;
+    private COLOR color;
 
-    final List<Item> subItems = new ArrayList<>();
+    final List<IModel> subItems = new ArrayList<>();
 
     Attribute attributes[] ;
 
     public AModel(int id, TYPE type){
         this.id = id;
         mType =type;
+        color = COLOR.getRandom();
     }
+
+    @Override
     public TYPE getType(){return mType;}
 
+    @Override
     public int getId() {
         return id;
     }
 
-    public List<Item> getSubItems() {
+    @Override
+    public List<IModel> getSubItems() {
         return subItems;
     }
 
+    @Override
+    public COLOR getColor() {
+        return color;
+    }
 
+    @Override
+    public void setColor(COLOR color) {
+        this.color = color;
+    }
 
     protected Item getItem(int id, TYPE type, String name){
-        AModel found = null;
+        IModel found = null;
         if(id>0) {
-            for (AModel subModel : subItems) {
+            for (IModel subModel : subItems) {
                 if (subModel.getId() == id) {
                     found = subModel;
                     break;
@@ -52,7 +66,7 @@ public abstract class AModel implements IModel {
         }
 
         if(found != null && type != null) {
-            for (AModel subModel : subItems) {
+            for (IModel subModel : subItems) {
                 if (subModel.getType().equals(type)) {
                     found = subModel;
                     break;
@@ -61,7 +75,7 @@ public abstract class AModel implements IModel {
         }
 
         if(found == null && !TextUtils.isEmpty(name)){
-            for (AModel subModel : subItems) {
+            for (IModel subModel : subItems) {
                 if (subModel.getName().equals(name)) {
                     found = subModel;
                     break;
@@ -75,6 +89,7 @@ public abstract class AModel implements IModel {
 
     public abstract Answer interactWithItem(Item item);
 
+    @Override
     public Attribute[] getAttributes() {
         return attributes;
     }
@@ -86,8 +101,8 @@ public abstract class AModel implements IModel {
 
     protected Answer checkSubModels(Command command){
         Answer answer = null;
-        for(AModel subModel: subItems){
-            answer = subModel.executeCommand(command);
+        for(IModel subModel: subItems){
+            answer = subModel.processCommand(command);
             if(answer != null && !TextUtils.isEmpty(answer.getMessage())) return answer;
         }
 
@@ -96,18 +111,18 @@ public abstract class AModel implements IModel {
 
     protected boolean hasItem(Item item){
 
-        for(Item found :subItems){
+        for(IModel found :subItems){
             if(found.getName().equalsIgnoreCase(item.getName()))return true;
         }
         return false;
     }
     public Item findItemByName(String name){
-        for(Item item : subItems)if(item.getName().equals(name))return item;
+        for(IModel item : subItems)if(item.getName().equals(name))return (Item) item;
         return null;
     }
 
     public void removeItemByName(String name){
-        for(Item item : subItems)if(item.getName().equals(name)){
+        for(IModel item : subItems)if(item.getName().equals(name)){
             subItems.remove(item);
             return;
         }

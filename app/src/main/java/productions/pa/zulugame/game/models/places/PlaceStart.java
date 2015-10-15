@@ -13,7 +13,7 @@ import productions.pa.zulugame.game.story.PlaceManager;
 /**
  * Created by Andrey on 09.10.2015.
  */
-public class PlaceStart extends APlace {
+public class PlaceStart extends Room {
 
     private static final String NAME = "The Start of the Labyrinth";
     private static final String DESCRIPTION =
@@ -44,7 +44,7 @@ public class PlaceStart extends APlace {
 
     @Override
     public String getDescription() {
-        return DESCRIPTION;
+        return DESCRIPTION + super.getDescription();
     }
 
 

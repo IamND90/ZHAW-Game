@@ -20,7 +20,7 @@ import productions.pa.zulugame.game.parser.ParsedInput;
 import productions.pa.zulugame.game.parser.Parser;
 import productions.pa.zulugame.game.story.PersonManager;
 import productions.pa.zulugame.game.story.PlaceManager;
-import productions.pa.zulugame.game.story.QuestManager;
+import productions.pa.zulugame.game.story.RiddleManager;
 
 /**
  * Created by Andrey on 08.10.2015.
@@ -74,7 +74,7 @@ public class Game implements InputCallback {
         }
 
         if(command.getType().equals(HitWordType.ANSWER)){
-            Answer answer = QuestManager.get().processAnswer(command);
+            Answer answer = RiddleManager.get().processAnswer(command);
             if(answer.getAnswerTypes()[0].equals(Answer.TYPE.ITEM_NOT_FOUND)) {
                 processCommand(command);
             }
@@ -133,7 +133,7 @@ public class Game implements InputCallback {
 
         APlace place = PlaceManager.get().getCurrentPlace();
 
-        Answer answer = place.executeCommand(command);
+        Answer answer = place.processCommand(command);
 
         if(answer == null ){
             messageCallback.onErrorReceived("Action not found: " + command.getString());

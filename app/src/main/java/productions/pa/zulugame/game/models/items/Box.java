@@ -2,9 +2,11 @@ package productions.pa.zulugame.game.models.items;
 
 import java.util.List;
 
+import productions.pa.zulugame.game.Utils;
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
 import productions.pa.zulugame.game.models.AModel;
+import productions.pa.zulugame.game.models.IModel;
 import productions.pa.zulugame.game.parser.HitWordFactory;
 import productions.pa.zulugame.game.story.PersonManager;
 
@@ -16,7 +18,8 @@ public class Box extends AModel{
     final static String FLAGS_ACTIONS[] ={HitWordFactory.TAKE,HitWordFactory.GET};
     private static int count_boxes = 0;
 
-    public Box() {
+
+    public Box(List<Item> containingItems) {
         super(count_boxes++, TYPE.BOX);
     }
 
@@ -27,28 +30,38 @@ public class Box extends AModel{
 
     @Override
     public String getName() {
-        return null;
+        return "Box";
     }
 
     @Override
     public String getDescription() {
-        return null;
+        String description = "This box contains " +getSubItems().size() + "items";
+
+        int riddles =0;
+
+        for(IModel item :getSubItems()){
+            if(item.getType().equals(TYPE.RIDDLE))riddles++;
+            if(item.getType().equals(TYPE.KEY)) description+= ("\nKey[" + item.getId() +"]");
+        }
+
+        description += (riddles== 0 ? "" : ("\n" + riddles + " riddles"));
+        return description;
     }
 
     @Override
-    public Answer executeCommand(Command command) {
+    public Answer processCommand(Command command) {
 
         //TODO chack utinls
-        // if(Utils.hasString(FLAGS_ACTIONS,command.getAction()){
-        if(true){
+         if(Utils.findInList(FLAGS_ACTIONS,command.getAction().getString()) != null){
             if(command.getAttribute() != null) {
                 String attribute = command.getAttribute().getString();
-                Item item = findByNameItem(getSubItems(), attribute);
+                Item item = Utils.findItemByName(getSubItems(), attribute);
                 if (item == null) return new Answer(
                         getName() + " does not contain " + attribute, Answer.TYPE.ITEM_NOT_FOUND);
 
                 if(PersonManager.get().getPerson().getBackpack().addItem(item)){
-
+                    getSubItems().remove(item);
+                    return new Answer("You added " + item.getName() + " to your backpack.", Answer.TYPE.SUCCESS);
                 }
             }
             return new Answer("Item not found", Answer.TYPE.ITEM_NOT_FOUND);
@@ -57,10 +70,5 @@ public class Box extends AModel{
         return null;
     }
 
-    public static Item findByNameItem(List<Item> list, String input){
-        for(Item item:list){
-            if(item.getName().equals(input))return item;
-        }
-        return null;
-    }
+
 }

@@ -9,11 +9,11 @@ import productions.pa.zulugame.game.parser.HitWordFactory;
 /**
  * Created by Andrey on 09.10.2015.
  */
-public class PlaceRoom1 extends APlace {
+public class PlaceRoom1 extends Room {
 
     private static final String NAME = "Tiny chamber";
     private static final String DESCRIPTION =
-            "The room is dark, approximately 1 by 1 meters, no light.";
+            "The room is dark, approximately 1 by 1 meters, no light.\n";
     private static final String STORY = "You enter a small chamber with no light in it, right.\n";
 
 
@@ -36,11 +36,11 @@ public class PlaceRoom1 extends APlace {
 
     @Override
     public String getDescription() {
-        return DESCRIPTION;
+        return DESCRIPTION + super.getDescription();
     }
 
     @Override
-    public Answer executeCommand(Command command) {
+    public Answer processCommand(Command command) {
 
         return checkSubModels(command);
     }
@@ -49,4 +49,6 @@ public class PlaceRoom1 extends APlace {
     public Answer interactWithItem(Item item) {
         return new Answer(MessageFactory.MESSAGE_CANNOT_INTERACT, Answer.TYPE.FAIL);
     }
+
+
 }

@@ -31,7 +31,7 @@ public class Key extends Item {
     }
 
     @Override
-    public Answer executeCommand(Command command) {
+    public Answer processCommand(Command command) {
         return null;
     }
 }

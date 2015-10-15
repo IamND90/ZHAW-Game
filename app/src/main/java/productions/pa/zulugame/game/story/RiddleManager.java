@@ -2,21 +2,21 @@ package productions.pa.zulugame.game.story;
 
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
-import productions.pa.zulugame.game.story.quests.Quest;
+import productions.pa.zulugame.game.models.quests.Riddle;
 
 /**
  * Created by IamND on 15.10.2015.
  */
-public class QuestManager {
+public class RiddleManager {
 
-    private static QuestManager mThis = null;
+    private static RiddleManager mThis = null;
 
-    Quest currentQuest = null;
+    Riddle currentQuest = null;
 
-    public static QuestManager get(){
+    public static RiddleManager get(){
         if(mThis == null){
-            synchronized (QuestManager.class){
-                mThis = new QuestManager();
+            synchronized (RiddleManager.class){
+                mThis = new RiddleManager();
             }
         }
         return mThis;
@@ -28,7 +28,7 @@ public class QuestManager {
         if(currentQuest == null)
             return new Answer("No Quest you are working on", Answer.TYPE.ITEM_NOT_FOUND);
 
-        currentQuest.processAnswer(command);
+        currentQuest.processCommand(command);
 
         return null;
     }

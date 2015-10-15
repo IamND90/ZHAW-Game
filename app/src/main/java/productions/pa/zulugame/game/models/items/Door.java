@@ -4,6 +4,7 @@ import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
 import productions.pa.zulugame.game.models.places.APlace;
+import productions.pa.zulugame.game.models.places.Room;
 import productions.pa.zulugame.game.parser.Attribute;
 import productions.pa.zulugame.game.parser.HitWordFactory;
 import productions.pa.zulugame.game.story.PersonManager;
@@ -15,15 +16,15 @@ import productions.pa.zulugame.game.story.PlaceManager;
 public class Door extends APlace {
 
     public static final int DOOR_START_ID = 1000;
+    private Room parentPlaces[];
 
-    public Door(int id) {
-        super(id);
+    public Door(Room room1, Room room2) {
+        super(room1.getId(),TYPE.DDOR);
+        parentPlaces = new Room[]{room1,room2};
+
     }
 
-    @Override
-    public String getStory() {
-        return null;
-    }
+
 
     @Override
     public Answer interactWithItem(Item item) {
@@ -50,21 +51,21 @@ public class Door extends APlace {
 
     @Override
     public String getName() {
-        return null;
+        return "Door";
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "This Door links room [" + parentPlaces[0].getName() + "] and [" + parentPlaces[1].getName()+"]";
     }
 
     @Override
-    public Answer executeCommand(Command command) {
+    public Answer processCommand(Command command) {
         if(command.getAction().getString().equalsIgnoreCase(Attribute.ACTING.OPEN.name())) {
             if(command.getAttribute().getString().equalsIgnoreCase(HitWordFactory.DOOR)){
-                Door place = (Door) findPlaceByDirection(command.getPointer().getString());
+                Room place =findPlaceByDirection(command.getPointer().getString());
                 if(place != null){
-                    return  place.executeCommand(command);
+                    return  place.processCommand(command);
                 }
 
             }
@@ -74,11 +75,9 @@ public class Door extends APlace {
 
         return null;
     }
-    public void setNextPlace(APlace place){nextPlaces.add(place);}
 
-    public APlace getNextPlace(){
-        return (PlaceManager.get().getCurrentPlace().getId() == getParentPlace().getId() ?  nextPlaces.get(0) : getParentPlace());
-    }
+
+
 
     public boolean open(){
 
@@ -91,5 +90,21 @@ public class Door extends APlace {
             }
         }
         return true;
+    }
+
+
+    @Override
+    public Room getPreviousPlace() {
+        return (PlaceManager.get().getCurrentPlace().getId() == parentPlaces[1].getId() ?  parentPlaces[1] : parentPlaces[0]);
+    }
+
+    public Room getNextPlace(){
+        //TODO
+        return (PlaceManager.get().getCurrentPlace().getId() == parentPlaces[0].getId() ?  parentPlaces[1] : parentPlaces[0]);
+    }
+
+    @Override
+    public Room[] getNextPlaces() {
+        return parentPlaces;
     }
 }

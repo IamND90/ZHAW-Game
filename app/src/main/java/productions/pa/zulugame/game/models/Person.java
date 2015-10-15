@@ -2,6 +2,7 @@ package productions.pa.zulugame.game.models;
 
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
+import productions.pa.zulugame.game.models.items.Backpack;
 import productions.pa.zulugame.game.models.items.Item;
 import productions.pa.zulugame.game.story.ModelManager;
 
@@ -35,7 +36,7 @@ public class Person extends AModel {
     }
 
     @Override
-    public Answer executeCommand(Command command) {
+    public Answer processCommand(Command command) {
         Answer answer = null;
 
 
