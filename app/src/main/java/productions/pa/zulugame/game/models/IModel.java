@@ -8,6 +8,7 @@ import productions.pa.zulugame.game.commands.Command;
  */
 public interface IModel {
 
+    
     String getName();
     String getDescription();
 
@@ -20,6 +21,8 @@ public interface IModel {
 
         ITEM,
         PERSON,
-        PLACE
+        PLACE,
+
+        QUEST
     }
 }

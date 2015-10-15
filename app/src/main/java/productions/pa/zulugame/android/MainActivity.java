@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import productions.pa.zulugame.R;
 import productions.pa.zulugame.game.Game;
+import productions.pa.zulugame.output.Printer;
 
 public class MainActivity extends AppCompatActivity implements UIHandler,View.OnKeyListener {
 
@@ -26,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
 
     Game myGame;
 
+    Printer printer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
 
         buttonEnterCommand = (ImageButton) findViewById(R.id.imageButton);
 
-
+        printer = new Printer(this,textOutput);
         myGame = new Game(this);
 
         buttonEnterCommand.setOnClickListener(new View.OnClickListener() {
@@ -88,10 +91,11 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
     @Override
     public void onMessageReceived(String message) {
         String text = textOutput.getText().toString();
+        if(printer == null) return;
 
-        if(TextUtils.isEmpty(message))textOutput.setText("");
+        if(TextUtils.isEmpty(message))printer.clear();
         else
-            textOutput.setText(text + "\n" + message);
+            printer.print(message);
 
         textInput.setText("");
         textError.setVisibility(View.GONE);

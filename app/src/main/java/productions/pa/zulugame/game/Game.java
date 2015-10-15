@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import productions.pa.zulugame.android.InputCallback;
@@ -28,10 +29,14 @@ public class Game implements InputCallback {
     static Game mThis;
     static UIHandler messageCallback;
 
-    PlaceManager mStoryTree;
+    Gamestatus status;
+
+
+    ArrayList<String> list = new ArrayList<>();
 
     public Game(UIHandler messageCallback) {
         this.messageCallback = messageCallback;
+
 
         //Let the user know, that the game is ready to start
         messageCallback.onMessageReceived(MessageFactory.MESSAGE_WELCOME_GAME);
@@ -111,28 +116,27 @@ public class Game implements InputCallback {
         }
 
 
-        if (mStoryTree == null) {
+        if (status.equals(Gamestatus.NOT_STARTED)) {
             messageCallback.onMessageReceived(MessageFactory.MESSAGE_ENTER_START);
             return;
         }
 
-        APlace place = mStoryTree.getCurrentPlace();
+        APlace place = PlaceManager.get().getCurrentPlace();
 
-        if (place != null) {
-            Answer answer = place.executeCommand(command);
-            //dummy
-            if(answer == null ){
-                messageCallback.onErrorReceived("Action not found: " + command.getString());
-                return;
-            }
-            if(answer.getAnswerTypes()[0] == Answer.TYPE.FAIL){
-                processFail(answer);
+        Answer answer = place.executeCommand(command);
 
-                return;
-            }
-
-            processAnswer(answer);
+        if(answer == null ){
+            messageCallback.onErrorReceived("Action not found: " + command.getString());
+            return;
         }
+        if(answer.getAnswerTypes()[0] == Answer.TYPE.FAIL){
+            processFail(answer);
+
+            return;
+        }
+
+        processAnswer(answer);
+
     }
 
     private void processFail(Answer answer) {
@@ -163,20 +167,27 @@ public class Game implements InputCallback {
 
     private void startGame() {
         //TODO
-        mStoryTree = PlaceManager.get();
+        status = Gamestatus.RUNNING;
         messageCallback.clearScreen();
-        messageCallback.onMessageReceived(mStoryTree.getCurrentPlace().getStory());
+        messageCallback.onMessageReceived(PlaceManager.get().getCurrentPlace().getStory());
     }
 
 
     public String getCurrentInfo() {
         //TODO
-        if (mStoryTree == null) return MessageFactory.MESSAGE_ENTER_START;
-        APlace place = mStoryTree.getCurrentPlace();
+        if (status == null || status.equals(Gamestatus.NOT_STARTED)) return MessageFactory.MESSAGE_ENTER_START;
+        APlace place = PlaceManager.get().getCurrentPlace();
         if (place != null) {
             return place.getDescription();
         }
 
         return "no info";
+    }
+
+    enum Gamestatus{
+        NOT_STARTED,
+        RUNNING,
+        PAUSE,
+        OVER
     }
 }
