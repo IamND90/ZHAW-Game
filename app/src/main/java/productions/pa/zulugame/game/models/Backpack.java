@@ -12,8 +12,13 @@ import productions.pa.zulugame.game.story.ModelManager;
  */
 public class Backpack extends Item {
 
+    //TODO add space
+    final int MAXIMUM_SPACE = 50;
+
+
+
     public Backpack() {
-        super(ModelManager.ID_BACKPACK);
+        super(ModelManager.ID_BACKPACK, null);
     }
 
     @Override
@@ -30,7 +35,8 @@ public class Backpack extends Item {
     public Answer executeCommand(Command command) {
 
         if (command.getAction().equals(HitWordFactory.GET) || command.getAction().equals(HitWordFactory.USE)) {
-            if(isEmpty()){return new Answer(MessageFactory.MESSAGE_BACKPACK_IS_EMPTY).setContextId(getId());}
+            if(getSubItems().isEmpty()){return new Answer(MessageFactory.MESSAGE_BACKPACK_IS_EMPTY).setContextId(getId());}
+
             if(command.getAttribute() != null){
                 Item foundItem = getItem(-1,null,command.getAttribute().getString());
                 if(foundItem == null)return new Answer(MessageFactory.MESSAGE_BACKPACK_DOES_NOT_HAS_ITEMS).setContextId(getId());
@@ -43,12 +49,26 @@ public class Backpack extends Item {
         return null;
     }
 
-    public boolean isEmpty() {
-        return !(interactItem == null && interactItem.length == 0);
-    }
-
     @Override
     public Answer interactWithItem(Item item) {
         return null;
+    }
+
+    public boolean addItem(Item item) {
+
+        if(getLeftSpace() > item.getSpaceUsed()) {
+            getSubItems().add(item);
+        }
+        return false;
+    }
+
+    public int getLeftSpace() {
+        return MAXIMUM_SPACE - getSpaceUsed();
+    }
+
+    public int getSpaceUsed() {
+        int space = 0;
+        for(Item item : getSubItems())space += item.getSpaceUsed();
+        return space;
     }
 }
