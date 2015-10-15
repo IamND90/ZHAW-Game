@@ -10,6 +10,7 @@ public class HitWordFactory {
     public static final String INFO = "info";
     public static final String START = "start";
     public static final String NAME = "name";
+    public static final String ANSWER = "answer";
 
     //MOVING
     public static final String GO = "go";

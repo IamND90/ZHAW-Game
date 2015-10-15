@@ -46,7 +46,7 @@ public class ParsedInput {
         }
 
 
-        //Search Command
+        //Search What
         for(HitWord hitword : myHitwordsFound){
             if(hitword.getType().equals(HitWordType.SUDO) ||hitword.getType().equals(HitWordType.MOVING) || hitword.getType().equals(HitWordType.ACTING)){
                 command = hitword;
@@ -62,13 +62,17 @@ public class ParsedInput {
                 break;
             }
         }
-        //Search Command
+        //Search Attribute
         for(HitWord hitword : myHitwordsFound){
             if(hitword.getType().equals(HitWordType.ITEM) || hitword.getType().equals(HitWordType.PLACE)){
                 attribute = hitword;
                 if(type.equals(HitWordType.UNKNOWN))type = attribute.getType();
                 break;
             }
+        }
+        //If all the words not hitwords, maybe its an answer
+        if(command == null && pointer == null && attribute == null){
+            return new Command(HitWordType.ANSWER,command,pointer,myHitwordsFound);
         }
 
         return new Command(type,command,pointer,attribute);
