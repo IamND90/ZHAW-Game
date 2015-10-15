@@ -16,5 +16,7 @@ public enum HitWordType {
     PLACE,
 
     UNKNOWN,
-    NOT_FOUND
+    NOT_FOUND,
+
+    ANSWER
 }

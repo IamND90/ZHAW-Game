@@ -20,13 +20,14 @@ import productions.pa.zulugame.game.parser.ParsedInput;
 import productions.pa.zulugame.game.parser.Parser;
 import productions.pa.zulugame.game.story.PersonManager;
 import productions.pa.zulugame.game.story.PlaceManager;
+import productions.pa.zulugame.game.story.QuestManager;
 
 /**
  * Created by Andrey on 08.10.2015.
  */
 public class Game implements InputCallback {
 
-    static Game mThis;
+
     static UIHandler messageCallback;
 
     Gamestatus status;
@@ -72,9 +73,17 @@ public class Game implements InputCallback {
             return;
         }
 
+        if(command.getType().equals(HitWordType.ANSWER)){
+            Answer answer = QuestManager.get().processAnswer(command);
+            if(answer.getAnswerTypes()[0].equals(Answer.TYPE.ITEM_NOT_FOUND)) {
+                processCommand(command);
+            }
+        }
+
         processCommand(command);
 
     }
+
 
     private void processCommand(Command command) {
 
@@ -90,6 +99,7 @@ public class Game implements InputCallback {
                                 return;
                             }
                             break;
+
                     }
                 }
                 break;
@@ -135,7 +145,7 @@ public class Game implements InputCallback {
             return;
         }
 
-        processAnswer(answer);
+        processOutput(answer);
 
     }
 
@@ -148,21 +158,26 @@ public class Game implements InputCallback {
         messageCallback.onErrorReceived("Could not interact with the command");
     }
 
-    private void processAnswer(Answer answer) {
-
+    private boolean processOutput(Answer answer) {
+        if(answer == null){
+            messageCallback.onErrorReceived("Answer is null");
+            return false;
+        }
         for(Answer.TYPE commands: answer.getAnswerTypes()){
             switch (commands){
                 case SIMPLE_OUTPUT:
                     messageCallback.onMessageReceived(answer.getMessage());
-                    return;
+                    return true;
 
                 case MOVE_TO_PLACE:
                     if(PlaceManager.get().moveAtPlace(answer.getContextId())){
                         messageCallback.onMessageReceived(answer.getMessage());
-                        return;
+                        return true;
                     }
             }
         }
+
+        return false;
     }
 
     private void startGame() {

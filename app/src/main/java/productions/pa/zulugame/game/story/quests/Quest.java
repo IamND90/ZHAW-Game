@@ -1,5 +1,7 @@
 package productions.pa.zulugame.game.story.quests;
 
+import productions.pa.zulugame.game.commands.Answer;
+import productions.pa.zulugame.game.commands.Command;
 import productions.pa.zulugame.game.models.IModel;
 
 /**
@@ -8,6 +10,8 @@ import productions.pa.zulugame.game.models.IModel;
 public abstract class Quest implements IModel{
 
     private String name, description;
+
+    //TODO attrubutes plus
 
     public Quest(String name, String description) {
         this.name = name;

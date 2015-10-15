@@ -1,5 +1,8 @@
 package productions.pa.zulugame.game.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import productions.pa.zulugame.game.parser.HitWord;
 import productions.pa.zulugame.game.parser.HitWordType;
 
@@ -11,13 +14,28 @@ public class Command {
     HitWordType mType;
     HitWord mAction;
     HitWord mPointer;
-    HitWord mAttribute;
+    List<HitWord> mAttribute = new ArrayList<>();
 
     public Command(HitWordType type, HitWord action, HitWord pointer, HitWord attribute){
         mAction = action == null ? new HitWord("",HitWordType.UNKNOWN) : action;
         mPointer = pointer== null ? new HitWord("",HitWordType.UNKNOWN) : pointer;
         mType = type;
-        mAttribute = attribute== null ? new HitWord("",HitWordType.UNKNOWN) : attribute;
+        mAttribute.add(attribute== null ? new HitWord("",HitWordType.UNKNOWN) : attribute);
+    }
+
+    public Command(HitWordType type, HitWord action, HitWord pointer, List<HitWord> attributes){
+        mAction = action == null ? new HitWord("",HitWordType.UNKNOWN) : action;
+        mPointer = pointer== null ? new HitWord("",HitWordType.UNKNOWN) : pointer;
+        mType = type;
+        mAttribute = attributes;
+    }
+
+    public void addAttribute(HitWord attribute){
+        mAttribute.add(attribute);
+    }
+
+    public List<HitWord> getAttributes() {
+        return mAttribute;
     }
 
     public HitWord getPointer() {
@@ -25,7 +43,7 @@ public class Command {
     }
 
     public HitWord getAttribute() {
-        return mAttribute;
+        return mAttribute.get(0);
     }
 
     public HitWordType getType() {
@@ -41,7 +59,8 @@ public class Command {
 
         builder.append("Action: [" + (mAction== null ? "" : mAction.getString()) + "], ");
         builder.append("Pointer: [" + (mPointer== null ? "" : mPointer.getString()) + "], ");
-        builder.append("Attribute: [" + (mAttribute== null ? "" : mAttribute.getString()) + "]");
+        for(int i =0; i < mAttribute.size(); i++)
+        builder.append("Attribute: [" + (mAttribute.get(i)== null ? "" : mAttribute.get(i).getString()) + "]");
 
         return builder.toString();
     }
