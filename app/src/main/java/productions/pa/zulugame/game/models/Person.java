@@ -11,8 +11,9 @@ import productions.pa.zulugame.game.story.ModelManager;
  */
 public class Person extends AModel {
 
-    static final String DESCRIPTION = "Person";
+
     String mName;
+    int lifeLeft = 1000;
 
     public Person(String name) {
         super(ModelManager.ID_MYPERSON,TYPE.PERSON);
@@ -32,7 +33,11 @@ public class Person extends AModel {
 
     @Override
     public String getDescription() {
-        return DESCRIPTION;
+
+        String info = getName() +", have " + lifeLeft + " life left.\n";
+        info += getBackpack().getDescription();
+
+        return info;
     }
 
     @Override
@@ -41,15 +46,14 @@ public class Person extends AModel {
 
 
 
-        return checkSubModels(command);
+        return answer;
     }
 
     public Backpack getBackpack(){
         return (Backpack) subItems.get(0);
     }
 
-    @Override
-    public Answer interactWithItem(Item item) {
-        return null;
+    public void appendLife(int value) {
+        lifeLeft += value;
     }
 }

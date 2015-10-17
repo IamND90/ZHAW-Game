@@ -1,70 +1,65 @@
 package productions.pa.zulugame.game.models.places;
 
+import android.util.Log;
+
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
-import productions.pa.zulugame.game.models.AModel;
 import productions.pa.zulugame.game.models.IModel;
 import productions.pa.zulugame.game.models.items.Box;
 import productions.pa.zulugame.game.models.items.Door;
-import productions.pa.zulugame.game.models.items.Item;
 import productions.pa.zulugame.game.parser.Attribute;
-import productions.pa.zulugame.game.parser.HitWordFactory;
-import productions.pa.zulugame.game.story.PlaceManager;
+import productions.pa.zulugame.game.parser.HitWord;
+import productions.pa.zulugame.game.story.RoomManager;
 
 /**
  * Created by Andrey on 08.10.2015.
  */
-public  abstract  class Room extends APlace {
-
-    protected Room parentPlace = null;
+public abstract class Room extends APlace {
+    private static final String TAG = "Room";
     List<Door> linkedDoors = new ArrayList<>();
 
-    public Room(int id){
-        super(id,TYPE.ROOM);
+    public Room(int id) {
+        super(id, TYPE.ROOM);
     }
 
-    @Override
-    public COLOR getColor() {
-        return null;
-    }
 
-    @Override
-    public void setColor(COLOR color) {
 
-    }
-
-    @Override
-    public Room getNextPlace() {
-        return linkedDoors.get(0).getNextPlace();
-    }
-
-    @Override
-    public Room[] getNextPlaces() {
-
-        Room rooms[] =  new Room[linkedDoors.size()];
-        for(int i =0; i< linkedDoors.size();i++){
-            Room room = linkedDoors.get(i).getNextPlace();
-            rooms[i] = room;
-        }
-        return rooms;
-    }
-
-    public Room addBranch( Room place, Attribute... attributes){
-        addDoor(new Door(this,place));
-        place.setParentPlace(this);
+    public Room addBoxItem(Box boxItem) {
+        getSubItems().add(boxItem);
         return this;
     }
 
-    public Door findDoorByPlaces(int... id){
-        for(int i =0 ; i < id.length ; i++){
-            for(Door door : linkedDoors){
-                if(door.getId() == id[i])return door;
+    public Room addBranch(Room place) {
+        Door door = new Door(this, place);
+        addDoor(door);
+        place.addDoor(door);
+        return this;
+    }
+
+    public Room addBranch(Room place, COLOR colorToOpenRoom) {
+        Door door = new Door(this, place);
+        door.setClosed(colorToOpenRoom.name());
+        addDoor(door);
+        place.addDoor(door);
+        return this;
+    }
+
+    public Door findDoorByPlaces(int... id) {
+        for (int i = 0; i < id.length; i++) {
+            for (Door door : linkedDoors) {
+                if (door.getId() == id[i]) return door;
             }
+        }
+        return null;
+    }
+
+    public Door findDoorByColor(COLOR color) {
+        for (Door door : linkedDoors) {
+            if (door.getColor().equals(color)) return door;
         }
         return null;
     }
@@ -73,50 +68,53 @@ public  abstract  class Room extends APlace {
         return linkedDoors;
     }
 
-    public Room getPreviousPlace(){return parentPlace;}
 
-    public Room getParentPlace() {
-        return parentPlace;
-    }
-
-    protected void addDoor(Door door){
-        if(door != null && findDoorByPlaces(getId()) != null)
-            linkedDoors.add(door);
-    }
-    public void setParentPlace(Room parentPlace) {
-        this.parentPlace = parentPlace;
-        Door door = parentPlace.findDoorByPlaces(getId(),parentPlace.getId());
-        //Do not add twice the same door
-        if(door != null && findDoorByPlaces(getId()) != null)
+    protected void addDoor(Door door) {
+        if (door != null && findDoorByColor(door.getColor()) == null)
             linkedDoors.add(door);
     }
 
-    public abstract  String getStory();
 
+    public abstract String getStory();
 
 
     @Override
     public Answer processCommand(Command command) {
         String action = command.getAction().getString();
-        if(action.equalsIgnoreCase(Attribute.ACTING.OPEN.name()) || action.equalsIgnoreCase(HitWordFactory.ENTER)) {
-            // Open the door / enter the room
-            // ================
-            String attribute =command.getAttribute().getString();
-            if(attribute.equalsIgnoreCase(HitWordFactory.DOOR) || attribute.equalsIgnoreCase(HitWordFactory.ROOM) ){
-                Door door = (Door) findDoorByDirection(command.getPointer().getString());
-                if(door != null){
-                    if( door.open()){
-                        if(PlaceManager.get().moveAtPlace(door.getNextPlace().getId())){
-                            return new Answer(PlaceManager.get().getCurrentPlace().getStory(), Answer.TYPE.SUCCESS, Answer.TYPE.MOVE_TO_PLACE);
-                        }
-                        else{
-                            //ERROR
-                        }
+        if (action.equalsIgnoreCase(Attribute.ACTING.OPEN.name()) || action.equalsIgnoreCase(HitWord.ENTER)) {
+            String attribute = command.getAttribute().getString();
+            // OPEN THE DOOR
+            if (attribute.equalsIgnoreCase(HitWord.DOOR)) {
+                Door door = findDoorByColor(command.getPointer().getString());
+                if (door == null && linkedDoors.size() > 0) door = linkedDoors.get(0);
+                Log.i(TAG, "Is door: " + door == null ? "null" : "");
+                if (door != null) {
+                    if (door.open()) {
+                        Log.d(TAG, "moving from " + getId() + " to place " + door.getNextPlace().getId());
+                        return new Answer("", Answer.TYPE.SUCCESS, Answer.TYPE.MOVE_TO_PLACE).setContextId(door.getNextPlace().getId());
+                    } else {
+                        Log.e(TAG, door.getColor().name() + " is closed, you need a key of the same color to open it");
+                        return new Answer(MessageFactory.MESSAGE_NO_KEY, Answer.TYPE.FAIL, Answer.TYPE.ITEM_NOT_FOUND);
                     }
-                    else return new Answer(MessageFactory.MESSAGE_NO_KEY, Answer.TYPE.FAIL, Answer.TYPE.ITEM_NOT_FOUND);
                 }
-                return new Answer("At [" + command.getPointer().getString() + "] is no door",Answer.TYPE.FAIL, Answer.TYPE.PLACE_NOT_FOUND);
+                return new Answer("No [" + command.getPointer().getString() + "] door in this room!", Answer.TYPE.SIMPLE_OUTPUT, Answer.TYPE.PLACE_NOT_FOUND);
             }
+
+            // ENTER A ROOM BY COLOR
+            if (attribute.equalsIgnoreCase(HitWord.ROOM)) {
+                Room room = findRoomByColor(command.getPointer().getString());
+                if (room != null) {
+                    if (room.open(this)) {
+
+                        Log.d(TAG, "moving from " + getId() + " to place " + RoomManager.get().getCurrentPlace().getId());
+                        return new Answer("", Answer.TYPE.SUCCESS, Answer.TYPE.MOVE_TO_PLACE).setContextId(room.getId());
+
+                    } else
+                        return new Answer(MessageFactory.MESSAGE_NO_KEY, Answer.TYPE.FAIL, Answer.TYPE.ITEM_NOT_FOUND);
+                }
+                return new Answer("No [" + command.getPointer().getString() + "] room is next to you!", Answer.TYPE.FAIL, Answer.TYPE.PLACE_NOT_FOUND);
+            }
+
             // Open a box
             // ================
             //TODO
@@ -125,38 +123,46 @@ public  abstract  class Room extends APlace {
         return checkSubModels(command);
     }
 
-    private Door findDoorByDirection(String string) {
 
-        for(Door door :linkedDoors){
-
+    protected boolean open(Room parentRoom) {
+        for (Door door : linkedDoors) {
+            if (door.findByRooms(this, parentRoom)) return door.open();
         }
+        return false;
+    }
 
+    private Door findDoorByColor(String color) {
+        for (Door door : linkedDoors) {
+            if (door.getColor().name().equalsIgnoreCase(color)) return door;
+        }
         return null;
     }
 
-    @Override
-    public String getName() {
+    private Room findRoomByColor(String color) {
+        for (Door door : linkedDoors) {
+            if (door.getNextPlace().getColor().name().equalsIgnoreCase(color))
+                return door.getNextPlace();
+
+        }
         return null;
     }
 
     @Override
     public String getDescription() {
-        String description = "This box contains " +getSubItems().size() + "items";
-        for(IModel item :getSubItems()){
-            if(item.getType().equals(TYPE.BOX)){
+        String description = "\nYou are in a " + getColor().name() + " room";
+        for (IModel item : getSubItems()) {
+            if (item.getType().equals(TYPE.BOX)) {
                 Box box = (Box) item;
-                description +=  "A box" + (box.getAttributes() == null ? "": "on the " + box.getAttributes()[0].getPointer().name());
+                description += "\n\tA " + box.getColor().name() + " box";
             }
         }
-        for(Door door : linkedDoors){
-            description += "A door on the " + (door.getAttributes() == null ? "": "on the " + door.getAttributes()[0].getPointer().name());
+        description += "\n";
+        for (Door door : linkedDoors) {
+            description += "\n\tA " + door.getColor().name() + " door";
         }
 
         return description;
     }
 
-    @Override
-    public Answer interactWithItem(Item item) {
-        return null;
-    }
+
 }

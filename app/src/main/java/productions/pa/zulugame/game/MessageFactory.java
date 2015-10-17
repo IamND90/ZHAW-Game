@@ -1,6 +1,6 @@
 package productions.pa.zulugame.game;
 
-import productions.pa.zulugame.game.parser.HitWordFactory;
+import productions.pa.zulugame.game.parser.HitWord;
 
 /**
  * Created by Andrey on 08.10.2015.
@@ -36,7 +36,7 @@ public class MessageFactory {
         String message = MESSAGE_HELP;
 
         String actions = "[ ";
-        for(String command: HitWordFactory.HITWORDS_SUDO){
+        for(String command: HitWord.HITWORDS_SUDO){
             actions+= (command + ",");
         }
         message = message.replace(PLACEHOLDER_SUDO,actions+ "]");

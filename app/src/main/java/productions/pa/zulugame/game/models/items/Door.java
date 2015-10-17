@@ -1,14 +1,13 @@
 package productions.pa.zulugame.game.models.items;
 
-import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
 import productions.pa.zulugame.game.models.places.APlace;
 import productions.pa.zulugame.game.models.places.Room;
 import productions.pa.zulugame.game.parser.Attribute;
-import productions.pa.zulugame.game.parser.HitWordFactory;
+import productions.pa.zulugame.game.parser.HitWord;
 import productions.pa.zulugame.game.story.PersonManager;
-import productions.pa.zulugame.game.story.PlaceManager;
+import productions.pa.zulugame.game.story.RoomManager;
 
 /**
  * Created by IamND on 09.10.2015.
@@ -17,35 +16,27 @@ public class Door extends APlace {
 
     public static final int DOOR_START_ID = 1000;
     private Room parentPlaces[];
+    private String keyColorNeededToOpen = null;
 
     public Door(Room room1, Room room2) {
-        super(room1.getId(),TYPE.DDOR);
+        super(room1.getId()*DOOR_START_ID + room2.getId(),TYPE.DDOR);
         parentPlaces = new Room[]{room1,room2};
-
     }
 
-
+    public Door setClosed(String keyColor){
+        keyColorNeededToOpen = keyColor;
+        return this;
+    }
 
     @Override
-    public Answer interactWithItem(Item item) {
-        boolean hasitem = hasItem(item);
-
-        switch (item.getName()){
-            case HitWordFactory.ITEM_KEY:
-                if(hasitem){
-                    //Open the door
-                    openDoor();
-                    return new Answer(MessageFactory.DOOR_UNLOCKED, Answer.TYPE.SUCCESS, Answer.TYPE.MOVE_TO_PLACE);
-                }
-
-                break;
-        }
-        if(!hasItem(item))return new Answer(MessageFactory.MESSAGE_BACKPACK_IS_EMPTY, Answer.TYPE.FAIL);
-        return null;
+    public int getId() {
+        return parentPlaces[0].getId() *DOOR_START_ID + parentPlaces[1].getId();
     }
 
-    private void openDoor() {
 
+
+    private void openDoor() {
+        keyColorNeededToOpen = null;
 
     }
 
@@ -62,49 +53,60 @@ public class Door extends APlace {
     @Override
     public Answer processCommand(Command command) {
         if(command.getAction().getString().equalsIgnoreCase(Attribute.ACTING.OPEN.name())) {
-            if(command.getAttribute().getString().equalsIgnoreCase(HitWordFactory.DOOR)){
-                Room place =findPlaceByDirection(command.getPointer().getString());
+            if(command.getAttribute().getString().equalsIgnoreCase(HitWord.DOOR)){
+                Room place =findRoomByColor(command.getPointer().getString());
                 if(place != null){
                     return  place.processCommand(command);
                 }
-
             }
-
-
         }
+        return null;
+    }
 
+    private Room findRoomByColor(String color) {
+        for(Room room : parentPlaces){
+            if(room.getColor().name().equalsIgnoreCase(color))return room;
+        }
         return null;
     }
 
 
+    public boolean open() {
 
-
-    public boolean open(){
-
-        if(hasAttribute(Attribute.STATUS.CLOSED)){
-            Item key = PersonManager.get().getPerson().getBackpack().findItemByName(HitWordFactory.ITEM_KEY);
-            if(key != null){
+        if (isClosed()) {
+            Item key = PersonManager.get().getPerson().getBackpack().findItemByNameAndColor(HitWord.ITEM_KEY, getColor().name());
+            if (key != null) {
                 //Remove the key from backpack because used
-                PersonManager.get().getPerson().getBackpack().removeItemByName(HitWordFactory.ITEM_KEY);
+                PersonManager.get().getPerson().getBackpack().removeItemByName(HitWord.ITEM_KEY);
                 return true;
             }
         }
         return true;
     }
 
-
-    @Override
     public Room getPreviousPlace() {
-        return (PlaceManager.get().getCurrentPlace().getId() == parentPlaces[1].getId() ?  parentPlaces[1] : parentPlaces[0]);
+        return (RoomManager.get().getCurrentPlace().getId() == parentPlaces[1].getId() ?  parentPlaces[1] : parentPlaces[0]);
     }
 
     public Room getNextPlace(){
         //TODO
-        return (PlaceManager.get().getCurrentPlace().getId() == parentPlaces[0].getId() ?  parentPlaces[1] : parentPlaces[0]);
+        return (RoomManager.get().getCurrentPlace().getId() == parentPlaces[0].getId() ?  parentPlaces[1] : parentPlaces[0]);
     }
 
-    @Override
     public Room[] getNextPlaces() {
         return parentPlaces;
+    }
+
+    public boolean isClosed() {
+        return keyColorNeededToOpen == null ? true : false;
+    }
+
+    public boolean findByRooms(Room room, Room room2) {
+
+        if((room.getId() == parentPlaces[0].getId() && room2.getId() == parentPlaces[1].getId()) ||
+                room.getId() == parentPlaces[1].getId() && room2.getId() == parentPlaces[0].getId() )
+            return true;
+
+        return false;
     }
 }

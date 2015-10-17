@@ -60,11 +60,6 @@ public abstract class Riddle implements IModel{
     }
 
     @Override
-    public Attribute[] getAttributes() {
-        return new Attribute[0];
-    }
-
-    @Override
     public List<IModel> getSubItems() {
         return null;
     }

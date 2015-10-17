@@ -7,14 +7,12 @@ import productions.pa.zulugame.game.models.AModel;
  */
 public abstract class Item extends AModel {
 
-    protected int usedSpace = 22;
 
     public Item(int id, TYPE type) {
         super(id, type);
     }
 
 
-    public int getSpaceUsed() {
-        return usedSpace;
-    }
+    protected abstract int getSpaceUsed();
+
 }

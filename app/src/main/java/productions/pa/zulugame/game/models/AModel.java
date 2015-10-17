@@ -23,7 +23,6 @@ public abstract class AModel implements IModel {
 
     final List<IModel> subItems = new ArrayList<>();
 
-    Attribute attributes[] ;
 
     public AModel(int id, TYPE type){
         this.id = id;
@@ -87,16 +86,19 @@ public abstract class AModel implements IModel {
         return (Item) found;
     }
 
-    public abstract Answer interactWithItem(Item item);
 
     @Override
-    public Attribute[] getAttributes() {
-        return attributes;
+    public String getDescription() {
+        if(getSubItems().isEmpty())return "";
+        String description = "This "+ getName() +" contains " +getSubItems().size() + " things.";
+
+        for(IModel item :getSubItems()){
+            description += ("\n" + item.getName() );
+        }
+
+        return description;
     }
 
-    public void setAttributes(Attribute... attributes) {
-        this.attributes = attributes;
-    }
 
 
     protected Answer checkSubModels(Command command){
@@ -109,6 +111,7 @@ public abstract class AModel implements IModel {
         return  new Answer(MessageFactory.MESSAGE_CANNOT_INTERACT, Answer.TYPE.FAIL);
     }
 
+
     protected boolean hasItem(Item item){
 
         for(IModel found :subItems){
@@ -117,44 +120,25 @@ public abstract class AModel implements IModel {
         return false;
     }
     public Item findItemByName(String name){
-        for(IModel item : subItems)if(item.getName().equals(name))return (Item) item;
+        for(IModel item : subItems)if(item.getName().equalsIgnoreCase(name))return (Item) item;
+        return null;
+    }
+    public IModel findByType(TYPE type){
+        for(IModel item : subItems)if(item.getType().equals(type))return item;
+        return null;
+    }
+    public Item findItemByNameAndColor(String name,String color){
+        for(IModel item : subItems)if(item.getName().equalsIgnoreCase(name) &&
+                item.getColor().name().equalsIgnoreCase(color))return (Item) item;
         return null;
     }
 
     public void removeItemByName(String name){
-        for(IModel item : subItems)if(item.getName().equals(name)){
+        for(IModel item : subItems)if(item.getName().equalsIgnoreCase(name)){
             subItems.remove(item);
             return;
         }
     }
 
-    public boolean hasAttribute(Attribute.STATUS status){
-        if(attributes== null)return false;
-        for(Attribute attribute : attributes)if(attribute.getStatus().equals(status))return true;
-        return false;
-    }
-    public boolean hasAttribute(Attribute.ACTING status){if(attributes== null)return false;
-        for(Attribute attribute : attributes)if(attribute.getAction().equals(status))return true;
-        return false;
-    }
-    public boolean hasAttribute(Attribute.POINTING status){
-        if(attributes== null)return false;
-        for(Attribute attribute : attributes)if(attribute.getPointer().equals(status))return true;
-        return false;
-    }
-    public boolean hasAllAttributes(Attribute attribute){
-        if(attributes== null)return false;
-            if(hasAttribute(attribute.getAction())
-               && hasAttribute(attribute.getStatus())
-                    && hasAttribute(attribute.getPointer()))return true;
-        return false;
-    }
-    public boolean hasOneAttribute(Attribute attribute){
-        if(attributes== null)return false;
-            if(hasAttribute(attribute.getAction())
-                    || hasAttribute(attribute.getStatus())
-                    || hasAttribute(attribute.getPointer()))return true;
-        return false;
-    }
-    protected boolean hasNoAttributes(){return attributes == null ? true : false;}
+
 }

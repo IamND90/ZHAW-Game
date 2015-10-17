@@ -1,6 +1,7 @@
 package productions.pa.zulugame.output;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -38,6 +39,10 @@ public class Printer {
 
 
     public void print(final String text){
+        outputView.setText(text);
+        return;
+        /*
+        Log.i("Printer",text);
         if(isRunningTask.get()){
             synchronized (waitingString) {
                 waitingString.add(text);
@@ -51,6 +56,7 @@ public class Printer {
         timePassed = 0;
 
         run(text);
+        */
     }
 
     public void append(String text){

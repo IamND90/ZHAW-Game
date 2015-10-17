@@ -3,10 +3,8 @@ package productions.pa.zulugame.game.models.items;
 import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
-import productions.pa.zulugame.game.models.AModel;
 import productions.pa.zulugame.game.models.IModel;
-import productions.pa.zulugame.game.models.items.Item;
-import productions.pa.zulugame.game.parser.HitWordFactory;
+import productions.pa.zulugame.game.parser.HitWord;
 import productions.pa.zulugame.game.story.ModelManager;
 
 /**
@@ -15,7 +13,6 @@ import productions.pa.zulugame.game.story.ModelManager;
 public class Backpack extends Item {
 
     //TODO add space
-    final int MAXIMUM_SPACE = 50;
 
 
 
@@ -30,13 +27,20 @@ public class Backpack extends Item {
 
     @Override
     public String getDescription() {
-        return "Here you can store your items";
+        String descr =  "Here you can store your items.\nYou have " + getUsedByItems() + "/" + getSpaceUsed() + " space used.";
+
+        int index = 1;
+        for(IModel item : getSubItems()){
+            descr += ("\n\t" + index++ + ".\t[" +item.getColor().name() + "\t" + item.getName() + "](" + item.getDescription() + ")");
+        }
+
+        return descr;
     }
 
     @Override
     public Answer processCommand(Command command) {
 
-        if (command.getAction().equals(HitWordFactory.GET) || command.getAction().equals(HitWordFactory.USE)) {
+        if (command.getAction().equals(HitWord.GET) || command.getAction().equals(HitWord.USE)) {
             if(getSubItems().isEmpty()){return new Answer(MessageFactory.MESSAGE_BACKPACK_IS_EMPTY).setContextId(getId());}
 
             if(command.getAttribute() != null){
@@ -51,30 +55,30 @@ public class Backpack extends Item {
         return null;
     }
 
-    @Override
-    public Answer interactWithItem(Item item) {
-        return null;
-    }
 
     public boolean addItem(Item item) {
 
         if(getLeftSpace() > item.getSpaceUsed()) {
             getSubItems().add(item);
+            return true;
         }
         return false;
     }
 
     public int getLeftSpace() {
-        return MAXIMUM_SPACE - getSpaceUsed();
+        return getSpaceUsed() - getUsedByItems();
     }
 
     public int getSpaceUsed() {
+        return 50;
+    }
+
+    private int getUsedByItems(){
         int space = 0;
         for(IModel model : getSubItems()){
-            if(model.getType().equals(TYPE.ITEM)) {
-                space += ((Item) model).getSpaceUsed();
-            }
+            space += ((Item) model).getSpaceUsed();
         }
         return space;
     }
+
 }

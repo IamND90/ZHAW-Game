@@ -1,5 +1,7 @@
 package productions.pa.zulugame.game.parser;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class ParsedInput {
     public Command createCommand(){
 
         // 0:command, 1: pointer, 2: attribute
-        HitWord command =null;
+        HitWord action =null;
         HitWord pointer = null;
         HitWord attribute = null;
         HitWordType type = HitWordType.UNKNOWN;
@@ -49,8 +51,8 @@ public class ParsedInput {
         //Search What
         for(HitWord hitword : myHitwordsFound){
             if(hitword.getType().equals(HitWordType.SUDO) ||hitword.getType().equals(HitWordType.MOVING) || hitword.getType().equals(HitWordType.ACTING)){
-                command = hitword;
-                type =  command.getType();
+                action = hitword;
+                type =  action.getType();
                 break;
             }
         }
@@ -71,11 +73,13 @@ public class ParsedInput {
             }
         }
         //If all the words not hitwords, maybe its an answer
-        if(command == null && pointer == null && attribute == null){
-            return new Command(HitWordType.ANSWER,command,pointer,myHitwordsFound);
+        if(action == null && pointer == null && attribute == null){
+            return new Command(HitWordType.ANSWER,action,pointer,myHitwordsFound);
         }
 
-        return new Command(type,command,pointer,attribute);
+        Command command =  new Command(type,action,pointer,attribute);
+        Log.w("Parser", command.getString());
+        return command;
     }
 
 }

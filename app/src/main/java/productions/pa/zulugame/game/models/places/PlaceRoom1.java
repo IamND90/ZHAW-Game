@@ -1,10 +1,7 @@
 package productions.pa.zulugame.game.models.places;
 
-import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.commands.Answer;
 import productions.pa.zulugame.game.commands.Command;
-import productions.pa.zulugame.game.models.items.Item;
-import productions.pa.zulugame.game.parser.HitWordFactory;
 
 /**
  * Created by Andrey on 09.10.2015.
@@ -42,12 +39,7 @@ public class PlaceRoom1 extends Room {
     @Override
     public Answer processCommand(Command command) {
 
-        return checkSubModels(command);
-    }
-
-    @Override
-    public Answer interactWithItem(Item item) {
-        return new Answer(MessageFactory.MESSAGE_CANNOT_INTERACT, Answer.TYPE.FAIL);
+        return super.processCommand(command);
     }
 
 

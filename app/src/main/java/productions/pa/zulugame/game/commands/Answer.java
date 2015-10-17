@@ -9,8 +9,13 @@ public class Answer {
 
     TYPE answerType[];
 
-    int contextId =0;
+    int contextId =-1;
     boolean isError = false;
+
+    public Answer(TYPE... type){
+        this.message = "No Answer set at " + contextId;
+        answerType = type;
+    }
 
     public Answer(String message, TYPE... type){
         this.message = message;

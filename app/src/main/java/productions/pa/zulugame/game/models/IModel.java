@@ -1,5 +1,7 @@
 package productions.pa.zulugame.game.models;
 
+import android.util.Log;
+
 import java.util.List;
 import java.util.Random;
 
@@ -20,7 +22,6 @@ public interface IModel {
     COLOR getColor();
     void setColor(COLOR color);
 
-    Attribute[] getAttributes();
     List<IModel> getSubItems();
     /**
      * @return String that should be diplayed*/
@@ -36,7 +37,8 @@ public interface IModel {
         BOX,
 
         RIDDLE,
-        KEY
+        KEY,
+        LIFEBOTTLE
     }
 
     enum COLOR{
@@ -46,14 +48,49 @@ public interface IModel {
         YELLOW,
         GREY,
         BLACK,
+        PURPLE,
+        ORANGE,
         WHITE;
 
         public static COLOR getRandom(){
 
             int random = Math.abs(new Random().nextInt());
             random = random%COLOR.values().length;
+            COLOR color = COLOR.values()[random];
 
-            return COLOR.values()[random];
+            Log.i("IModel" , "Color set " + color.name());
+
+            return color;
+        }
+
+        public static COLOR getRandomExclude(COLOR... exclude){
+
+            int random = Math.abs(new Random().nextInt());
+            random = random%COLOR.values().length;
+            COLOR color = COLOR.values()[random];
+
+            for(COLOR excl: exclude){
+                if(excl.equals(color))return getRandomExclude(exclude);
+            }
+
+            Log.i("IModel" , "Color set " + color.name());
+
+            return color;
+        }
+
+        public static COLOR getRandomMust(COLOR... include){
+
+            int random = Math.abs(new Random().nextInt());
+            random = random%COLOR.values().length;
+            COLOR color = COLOR.values()[random];
+
+            for(COLOR incl: include){
+                if(incl.equals(color))return color;
+            }
+
+            Log.i("IModel" , "Color set " + color.name());
+
+            return color;
         }
     }
 }

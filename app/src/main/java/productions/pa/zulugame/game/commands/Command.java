@@ -39,11 +39,11 @@ public class Command {
     }
 
     public HitWord getPointer() {
-        return mPointer;
+        return mPointer == null ? new HitWord("",HitWordType.UNKNOWN) : mPointer;
     }
 
     public HitWord getAttribute() {
-        return mAttribute.get(0);
+        return mAttribute.get(0)== null ? new HitWord("",HitWordType.UNKNOWN) : mAttribute.get(0);
     }
 
     public HitWordType getType() {
@@ -51,7 +51,7 @@ public class Command {
     }
 
     public HitWord getAction() {
-        return mAction;
+        return mAction == null ? new HitWord("",HitWordType.UNKNOWN) : mAction;
     }
 
     public String getString(){

@@ -8,30 +8,38 @@ import productions.pa.zulugame.game.commands.Command;
  */
 public class Key extends Item {
 
+    static int counter = 0;
 
 
-    public Key(int doorId) {
-        super(doorId, null);
+    public Key() {
+        super(counter++, TYPE.KEY);
 
     }
-
-    @Override
-    public Answer interactWithItem(Item item) {
-        return null;
+    public static Key generateKey(COLOR color){
+        Key key = new Key();
+        key.setColor(color);
+        return key;
     }
+
 
     @Override
     public String getName() {
-        return null;
+        return "Key";
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "Can open doors";
     }
 
     @Override
     public Answer processCommand(Command command) {
         return null;
+    }
+
+
+    @Override
+    protected int getSpaceUsed() {
+        return 4;
     }
 }

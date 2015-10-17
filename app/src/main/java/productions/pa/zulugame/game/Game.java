@@ -3,6 +3,7 @@ package productions.pa.zulugame.game;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +15,11 @@ import productions.pa.zulugame.game.commands.Command;
 import productions.pa.zulugame.game.models.places.APlace;
 import productions.pa.zulugame.game.parser.DialogFactory;
 import productions.pa.zulugame.game.parser.HitWord;
-import productions.pa.zulugame.game.parser.HitWordFactory;
 import productions.pa.zulugame.game.parser.HitWordType;
 import productions.pa.zulugame.game.parser.ParsedInput;
 import productions.pa.zulugame.game.parser.Parser;
 import productions.pa.zulugame.game.story.PersonManager;
-import productions.pa.zulugame.game.story.PlaceManager;
+import productions.pa.zulugame.game.story.RoomManager;
 import productions.pa.zulugame.game.story.RiddleManager;
 
 /**
@@ -30,7 +30,7 @@ public class Game implements InputCallback {
 
     static UIHandler messageCallback;
 
-    Gamestatus status;
+    Gamestatus status = Gamestatus.NOT_STARTED;
 
 
     ArrayList<String> list = new ArrayList<>();
@@ -88,15 +88,40 @@ public class Game implements InputCallback {
     private void processCommand(Command command) {
 
         //Process a help or info command
+        if(processSudoCommand(command))return;
+
+        if (status.equals(Gamestatus.NOT_STARTED)) {
+            messageCallback.onMessageReceived(MessageFactory.MESSAGE_ENTER_START);
+            return;
+        }
+
+        APlace place = RoomManager.get().getCurrentPlace();
+
+        Answer answer = place.processCommand(command);
+
+        if(answer == null ){
+            messageCallback.onErrorReceived("Action not found: " + command.getString());
+            return;
+        }
+        if(answer.getAnswerTypes()[0] == Answer.TYPE.FAIL && TextUtils.isEmpty(answer.getMessage())){
+            processFail(answer);
+        }
+
+        if(processPersonCommand(command))return;
+        processOutput(answer);
+
+    }
+
+    private boolean processSudoCommand(Command command) {
         switch (command.getType()) {
             case SETTINGS:
                 if (command.getPointer() != null) {
                     switch (command.getPointer().getString()){
-                        case HitWordFactory.NAME:
+                        case HitWord.NAME:
                             if(command.getAttribute() != null) {
                                 PersonManager.get().saveUserName(command.getAttribute().getString());
                                 messageCallback.onMessageReceived("Your name has been changed to " + command.getAttribute().getString());
-                                return;
+                                return true;
                             }
                             break;
 
@@ -107,46 +132,41 @@ public class Game implements InputCallback {
             case SUDO:
                 if (command.getAction() != null) {
                     switch (command.getAction().getString()) {
-                        case HitWordFactory.INFO:
+                        case HitWord.INFO:
                             messageCallback.clearScreen();
                             messageCallback.onMessageReceived(getCurrentInfo());
-                            return;
-                        case HitWordFactory.HELP:
+                            return true;
+                        case HitWord.HELP:
                             //this functions creates a pop-up dialog and show the help message
                             DialogFactory.createDialog((Context) messageCallback, DialogFactory.TITLE_HELP, MessageFactory.getHelpMessage());
                             messageCallback.onMessageReceived("");
-                            return;
-                        case HitWordFactory.START:
+                            return true;
+                        case HitWord.START:
                             startGame();
-                            return;
+                            return true;
                     }
                 }
                 break;
 
         }
+        return false;
+    }
 
+    private boolean processPersonCommand(Command command) {
 
-        if (status.equals(Gamestatus.NOT_STARTED)) {
-            messageCallback.onMessageReceived(MessageFactory.MESSAGE_ENTER_START);
-            return;
+        String attribute = command.getAttribute().getString();
+        if(command.getAction().getString().equalsIgnoreCase(HitWord.OPEN) || command.getAction().getString().equalsIgnoreCase(HitWord.SHOW)) {
+            // BACKPACK
+            if (attribute.equalsIgnoreCase(HitWord.ITEM_BACKACK)) {
+                messageCallback.onMessageReceived(PersonManager.get().getPerson().getBackpack().getDescription());
+                return true;
+            }
+            if (command.getPointer().getString().equalsIgnoreCase(HitWord.ME)) {
+                messageCallback.onMessageReceived(PersonManager.get().getPerson().getDescription());
+                return true;
+            }
         }
-
-        APlace place = PlaceManager.get().getCurrentPlace();
-
-        Answer answer = place.processCommand(command);
-
-        if(answer == null ){
-            messageCallback.onErrorReceived("Action not found: " + command.getString());
-            return;
-        }
-        if(answer.getAnswerTypes()[0] == Answer.TYPE.FAIL){
-            processFail(answer);
-
-            return;
-        }
-
-        processOutput(answer);
-
+        return false;
     }
 
     private void processFail(Answer answer) {
@@ -170,8 +190,8 @@ public class Game implements InputCallback {
                     return true;
 
                 case MOVE_TO_PLACE:
-                    if(PlaceManager.get().moveAtPlace(answer.getContextId())){
-                        messageCallback.onMessageReceived(answer.getMessage());
+                    if(RoomManager.get().moveAtPlace(answer.getContextId())){
+                        messageCallback.onMessageReceived(RoomManager.get().getCurrentPlace().getStory());
                         return true;
                     }
             }
@@ -184,14 +204,14 @@ public class Game implements InputCallback {
         //TODO
         status = Gamestatus.RUNNING;
         messageCallback.clearScreen();
-        messageCallback.onMessageReceived(PlaceManager.get().getCurrentPlace().getStory());
+        messageCallback.onMessageReceived(RoomManager.get().getCurrentPlace().getStory());
     }
 
 
     public String getCurrentInfo() {
         //TODO
         if (status == null || status.equals(Gamestatus.NOT_STARTED)) return MessageFactory.MESSAGE_ENTER_START;
-        APlace place = PlaceManager.get().getCurrentPlace();
+        APlace place = RoomManager.get().getCurrentPlace();
         if (place != null) {
             return place.getDescription();
         }

@@ -28,7 +28,7 @@ public class Parser {
         // Find and add all the word in our HitWordFactory
         // If the word if not found it will be added anyways, it as a type that is called NOT_FOUND for filtering later
         for (String word : words) {
-            HitWord foundHitword = HitWordFactory.findHitWord(word);
+            HitWord foundHitword = HitWord.findHitWord(word);
             //Add to found array if it is a found word
             if( !foundHitword.getType().equals(HitWordType.NOT_FOUND))
                 parsedInput.addHitWord(foundHitword);
