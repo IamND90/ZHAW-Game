@@ -1,5 +1,7 @@
 package productions.pa.zulugame.game.parser;
 
+import android.util.Log;
+
 import productions.pa.zulugame.game.models.IModel;
 
 /**
@@ -7,6 +9,7 @@ import productions.pa.zulugame.game.models.IModel;
  */
 public class HitWord {
 
+    private static final String TAG = "Hitword";
     //HELP AND ADMIN COMMANDS
     public static final String HELP = "help";
     public static final String INFO = "info";
@@ -16,181 +19,135 @@ public class HitWord {
 
     //MOVING
     public static final String GO = "go";
+    public static final String GOTO = "goto";
     public static final String ENTER = "enter";
-    public static final String LEAVE = "leave";
-    public static final String MOVE = "move";
-    public static final String WALK = "walk";
-    public static final String RUN = "run";
-    public static final String TURN = "turn";
+    public static final String RETURN = "return";
 
     //ACTING
     public static final String OPEN = "open";
     public static final String CLOSE = "close";
     public static final String TAKE = "take";
+    public static final String DROP = "drop";
+    public static final String REMOVE = "remove";
     public static final String USE = "use";
     public static final String GET = "get";
     public static final String SHOW = "show";
-    public static final String BUY = "buy";
-    public static final String EXCHANGE = "exchange";
+    public static final String STORE = "store";
+
 
     //POINTING
-    public static final String THIS = "this";
-    public static final String THE = "the";
-    public static final String ALL = "ALL";
+    public static final String ALL = "all";
     public static final String ME = "me";
-
-
 
 
     //PLECES
     public static final String ROOM = "room";
-    public static final String CHAMBER = "chamber";
     public static final String DOOR = "door";
-    public static final String WINDOW = "window";
-    public static final String FLOOR = "floor";
-    public static final String WALL = "wall";
     public static final String BOX = "box";
 
     //ITEMS
     public static final String ITEMS = "items";
     public static final String ITEM = "item";
-    public static final String ITEM_KEY = "KEY";
-    public static final String ITEM_BACKACK = "BACKPACK";
+    public static final String KEY = "key";
+    public static final String BACKPACK = "backpack";
+    public static final String BOTTLE = "bottle";
+    public static final String RIDDLE = "riddle";
 
 
     public static final String HITWORDS_SUDO[] = {
-            INFO,HELP,START
-    };
-
-    public static final String HITWORDS_MOVING[] = {
-            GO,LEAVE,MOVE,WALK,RUN,TURN,ENTER
+            INFO,HELP,START,ANSWER
     };
 
     public static final String HITWORDS_ACTING[] = {
-            OPEN,CLOSE,TURN,TAKE,GET,USE,SHOW,BUY,EXCHANGE
+            GO,ENTER,OPEN,CLOSE, RETURN,TAKE,
+            GET,USE,SHOW,STORE,DROP,
+            REMOVE
     };
 
     public static final String HITWORDS_POINTERS[] = {
-            ALL,THIS,THE,ME
+            ALL,ME,ANSWER
     };
 
     public static final String HITWORDS_PLACES[] = {
             //Big walktrough items
-            ROOM,CHAMBER,DOOR,WINDOW,FLOOR,WALL
+            ROOM,DOOR
     };
 
     public static final String HITWORDS_ITEMS[] = {
-            ITEM,ITEMS,BOX,ITEM_KEY,ITEM_BACKACK
+            ITEM,ITEMS,BOX, KEY, BACKPACK, BOTTLE,RIDDLE
     };
 
     public static HitWord findHitWord(String word){
 
-        // Chekc if it is and help or info word
+        Log.i(TAG,"Checking HITWORDS_SUDO:");
         for(String hitword: HITWORDS_SUDO){
-            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword,HitWordType.SUDO);
+            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword, TYPE.SUDO);
         }
-
-        //Chekc if it is a number
-        if(word.length() <4) {
-            boolean isNumber = false;
-            int number = 0;
-            try {
-                number = Integer.parseInt(word);
-                isNumber = true;
-            } catch (Exception e) {
-            }
-
-            if (isNumber) return new HitWord(number);
-        }
-
         // Find the word in our library, most common start first
-        for(String hitword: HITWORDS_MOVING){
-            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword,HitWordType.MOVING);
-        }
+        Log.i(TAG,"Checking HITWORDS_ACTING:");
         for(String hitword: HITWORDS_ACTING){
-            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword,HitWordType.ACTING);
+            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword, TYPE.ACTING);
         }
 
+        Log.i(TAG,"Checking HITWORDS_POINTERS:");
         for(String hitword: HITWORDS_POINTERS){
-            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword,HitWordType.POINTER);
+            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword, TYPE.POINTER);
         }
 
-        for(String hitword: HITWORDS_PLACES){
-            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword,HitWordType.PLACE);
-        }
-        for(String hitword: HITWORDS_ITEMS){
-            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword,HitWordType.ITEM);
-        }
-
+        Log.i(TAG,"Checking HITWORDS_COLORS:");
         for(IModel.COLOR hitword: IModel.COLOR.values()){
-            if(hitword.name().equalsIgnoreCase(word)) return new HitWord(hitword.name(),HitWordType.POINTER);
+            if(hitword.name().equalsIgnoreCase(word)) return new HitWord(hitword.name(), TYPE.POINTER);
         }
 
-        return new HitWord(word,HitWordType.NOT_FOUND);
-    }
-
-    public String isAction(String value){
-        for(String hitword: HITWORDS_MOVING){
-            if(hitword.equalsIgnoreCase(value)) return value;
-        }
-        for(String hitword: HITWORDS_ACTING){
-            if(hitword.equalsIgnoreCase(value)) return value;
-        }
-        return null;
-    }
-    public String isPointer(String value){
-
-        for(String hitword: HITWORDS_POINTERS){
-            if(hitword.equalsIgnoreCase(value))return value;
-        }
-        for(IModel.COLOR hitword: IModel.COLOR.values()){
-            if(hitword.name().equalsIgnoreCase(value)) return value;
-        }
-        return null;
-    }
-    public String isAttribute(String value){
+        Log.i(TAG,"Checking HITWORDS_PLACES:");
         for(String hitword: HITWORDS_PLACES){
-            if(hitword.equalsIgnoreCase(value))return value;
+            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword, TYPE.PLACE);
         }
+
+        Log.i(TAG,"Checking HITWORDS_ITEMS:");
         for(String hitword: HITWORDS_ITEMS){
-            if(hitword.equalsIgnoreCase(value))return value;
+            if(hitword.equalsIgnoreCase(word)) return new HitWord(hitword, TYPE.ITEM);
         }
-        return null;
+
+
+        Log.i(TAG,"NOT_FOUND");
+        return new HitWord(word, TYPE.NOT_FOUND);
     }
 
 
     // NOT STATIC PART
-    private int number =0;
     private String inputWord;
-    private HitWordType type;
+    private TYPE type;
 
-    public HitWord(String inputWord, HitWordType type){
+    public HitWord(String inputWord, TYPE type){
         this.inputWord = inputWord;
         this.type = type;
     }
 
-    public HitWord(String inputWord, HitWordType type,int inputNumber){
-        this.inputWord = inputWord;
-        number = inputNumber;
-        this.type = type;
-    }
 
 
-    public HitWord(int inputNumber){
-        inputWord = ""+number;
-        number = inputNumber;
-        this.type = HitWordType.NUMBER;
-    }
-
-    public int getNumber() {
-        return number;
-    }
 
     public String getString() {
         return inputWord == null ? "" : inputWord;
     }
 
-    public HitWordType getType() {
+    public TYPE getType() {
         return type;
     }
+    public enum TYPE {
+        SUDO,
+        SETTINGS,
+
+        ACTING,
+        POINTER, // mostly for colors
+        COLOR,
+        ITEM,
+        PLACE,
+
+        UNKNOWN,
+        NOT_FOUND,
+
+        ANSWER
+    }
+
 }

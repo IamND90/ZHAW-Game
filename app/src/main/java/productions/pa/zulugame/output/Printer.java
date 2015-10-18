@@ -1,107 +1,186 @@
 package productions.pa.zulugame.output;
 
-import android.app.Activity;
-import android.util.Log;
+import android.content.Context;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import productions.pa.zulugame.android.UIHandler;
+import productions.pa.zulugame.game.manager.PersonManager;
+import productions.pa.zulugame.game.parser.Answer;
 
 /**
  * Created by Andrey on 15.10.2015.
+ *
+ * Printer class that can add decorations to text and process it to the UI
  */
-public class Printer {
+public class Printer implements UIHandler{
 
-    static final int DELAY_MS = 6;
-    static final int DELAY_DOT_MS = 60;
-    static final int DELAY_NEW_LINE_MS = 160;
+    //  ------------------------------------------------------------
+    //  STATIC FINAL FIELDS
+    //  ------------------------------------------------------------
+    /**
+     * @param currentText the currently set text on the screen
+     * @param maxDecoPerLine counts the amount of max chars for top/bot decoration
+     * @param MAX_TEXT_LENGT max chars to not overload the android view*/
+    private static final int maxDecoPerLine = 32;
+    private static final int MAX_TEXT_LENGT = 680;
+    static Printer mThis;
 
-    final TextView outputView;
-    final Activity activity;
+    //  ------------------------------------------------------------
+    //  FIELDS
+    //  ------------------------------------------------------------
     String currentText ="";
-    int textLenght = 0 ;
-    int currentIndex = 0 ;
 
-    List<String> waitingString = new ArrayList<>();
-
-    AtomicBoolean isRunningTask= new AtomicBoolean();
-
-    long lastTime;
-    long timePassed;
+    /**
+     * @param outputView android defined textview
+     * @param scrollView android defined scrollview, to have a scrollview*/
+    final TextView outputView;
+    final ScrollView scrollView;
 
 
-    public Printer(Activity activity,TextView outputView){
+    //  ============================================================
+    //  CONSTRUCTOR ITEMS
+    //  ============================================================
+
+    public Printer(TextView outputView){
         this.outputView = outputView;
-        currentText = outputView.getText().toString();
-        this.activity = activity;
+        scrollView = (ScrollView) outputView.getParent();
+        mThis = this;
+
     }
 
+    public static Printer get(){
+        return mThis;
+    }
 
-    public void print(final String text){
-        outputView.setText(text);
-        return;
-        /*
-        Log.i("Printer",text);
-        if(isRunningTask.get()){
-            synchronized (waitingString) {
-                waitingString.add(text);
-            }
-            return;
+    //  ============================================================
+    //  @Override METHODS
+    //  ============================================================
+
+    @Override
+    public void onMessageReceived(String message,Answer.DECORATION... decorationType) {
+        //  Add deco if exists
+        if(decorationType != null && decorationType.length>0){
+            message= addDecoration(message,decorationType[0]);
         }
-        currentText = text;
-        currentIndex =0;
-        textLenght = text.length();
-        lastTime = System.currentTimeMillis();
-        timePassed = 0;
-
-        run(text);
-        */
-    }
-
-    public void append(String text){
-
+        postToUI(message);
 
     }
 
-    public void clear(){
-        print("");
+    @Override
+    public void onErrorReceived(String message) {
+        postToUI(addDecoration(message, Answer.DECORATION.ERROR));
     }
 
-    private void run(final String text){
-        if(!waitingString.isEmpty())waitingString.remove(0);
-        isRunningTask.set(true);
-        new Thread(new Runnable() {
+    @Override
+    public void clearScreen() {
+        currentText= "";
+        outputView.setText("");
+    }
 
+    //  Needed to get android local data store and resources
+    @Override
+    public Context getContext() {
+        return outputView.getContext();
+    }
+
+    //  ============================================================
+    //  PRIVATE / PROTECTED METHODS
+    //  ============================================================
+
+    private void postToUI(String text){
+        // Shorten the text if its too long
+        if(currentText.length()> MAX_TEXT_LENGT) {
+            int total = currentText.length()-1;
+            currentText = currentText.substring((int) (total*0.3),total);
+        }
+
+        //text = text.replaceAll("\n","");
+        currentText = currentText+"\n"+ text + "\n";
+
+        // Add text to UI
+        outputView.setText(currentText);
+        // Scroll full down
+        scrollView.post(new Runnable() {
             @Override
             public void run() {
-                if(text.length() == 0) return;
-                char current = text.charAt(0);
-                while(currentIndex < textLenght){
-                    if(timePassed >= ((current == '\n' || current == '.') ? (current == '.' ? DELAY_DOT_MS : DELAY_NEW_LINE_MS) : DELAY_MS)){
-                        String next = text.substring(0,currentIndex);
-                        setText(next);
-                        lastTime = System.currentTimeMillis();
-                        current = text.charAt(currentIndex++);
-                    }
 
-                    timePassed = System.currentTimeMillis() -lastTime;
-                }
-
-                isRunningTask.set(false);
-                if(!waitingString.isEmpty()){
-                    Printer.this.print(waitingString.get(0));
-                }
-            }
-        }).start();
-    }
-
-    private void setText(final String value){
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                outputView.setText(value);
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
+
+    /**
+     * Here are the decorations defined for the different output-types*/
+    private String addDecoration(String message,Answer.DECORATION deco) {
+        message = message.replaceAll("\n\n","\n");
+        if(message.startsWith("\n"))message = message.substring(1,message.length());
+
+        switch (deco) {
+            case SIMPLE:
+                message = addSideDecoration(message, ">");
+                break;
+            case FAIL:
+                message = addSideDecoration(message, ">f>");
+                break;
+            case RIDDLE:
+                message = addSideDecoration(message, "?");
+                message = addTopAndBotDecorations(message, "?");
+                break;
+            case ROOM_DESCRIPTION:
+                message = addSideDecoration(message, "||");
+                message = addTopAndBotDecorations(message, "=");
+                break;
+            case DESCRIPTION:
+                message = addSideDecoration(message, "|");
+                message = addTopAndBotDecorations(message, "-");
+                break;
+            case SETTINGS:
+                message = addSideDecoration(message, "&");
+                message = addTopAndBotDecorations(message, "&");
+                break;
+            case STATUS_CHANGE:
+                message = addSideDecoration(message, "!!");
+                message = addTopAndBotDecorations(message, "*");
+                break;
+            case BOX_ITEMS:
+                message = addSideDecoration(message, "=");
+                message = addTopAndBotDecorations(message, "=");
+                break;
+            case ADDING:
+                message = addSideDecoration(message, "+");
+                break;
+            case REMOVING:
+                message = addSideDecoration(message, "-");
+                message = addTopAndBotDecorations(message, "-");
+                break;
+            case ERROR:
+                message = addSideDecoration(message, ">ERR>");
+                break;
+            case PLAYER_MESSAGE_REPEAT:
+                message = "<" + PersonManager.get().getUserName()+ ">" + ": \"" + message + "\"";
+                break;
+        }
+        return message;
+    }
+
+    private String addTopAndBotDecorations(String message, String deco) {
+        String tabs = getTabs(maxDecoPerLine,deco);
+        message = tabs +"\n" + message + "\n" + tabs;
+        return message;
+    }
+
+    private String addSideDecoration(String message, String deco) {
+        if(deco == null  || deco == "") return message;
+        return deco + message.replaceAll("\n",("\n" + deco + "\t"));
+
+    }
+
+    private String getTabs(int count,String regex) {
+        String out = "";
+        for(; out.length() < count;)out+=regex;
+        return out;
+    }
+
+
 }

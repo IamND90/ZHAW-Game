@@ -1,18 +1,21 @@
 package productions.pa.zulugame.game.models.items;
 
-import productions.pa.zulugame.game.commands.Answer;
-import productions.pa.zulugame.game.commands.Command;
+import productions.pa.zulugame.game.models.baseclasses.AItem;
 
 /**
  * Created by Andrey on 15.10.2015.
+ *
+ * A Key can open doors if it has the same color or if needed the needed id by the door
  */
-public class Key extends Item {
+public class Key extends AItem {
 
-    static int counter = 0;
-
+    //  ============================================================
+    //  CONSTRUCTOR ITEMS
+    //  ============================================================
 
     public Key() {
-        super(counter++, TYPE.KEY);
+        super(TYPE.KEY);
+        spaceUsed = SPACE_KEY;
 
     }
     public static Key generateKey(COLOR color){
@@ -29,17 +32,8 @@ public class Key extends Item {
 
     @Override
     public String getDescription() {
-        return "Can open doors";
-    }
-
-    @Override
-    public Answer processCommand(Command command) {
-        return null;
+        return "Can open "+ getColor().name() + " doors";
     }
 
 
-    @Override
-    protected int getSpaceUsed() {
-        return 4;
-    }
 }

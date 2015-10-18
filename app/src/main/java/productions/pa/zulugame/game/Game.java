@@ -1,216 +1,237 @@
 package productions.pa.zulugame.game;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.util.Log;
 
 import productions.pa.zulugame.android.InputCallback;
 import productions.pa.zulugame.android.UIHandler;
-import productions.pa.zulugame.game.commands.Answer;
-import productions.pa.zulugame.game.commands.Command;
-import productions.pa.zulugame.game.models.places.APlace;
-import productions.pa.zulugame.game.parser.DialogFactory;
+import productions.pa.zulugame.game.manager.ContextManager;
+import productions.pa.zulugame.game.manager.PersonManager;
+import productions.pa.zulugame.game.manager.RiddleManager;
+import productions.pa.zulugame.game.manager.RoomManager;
+import productions.pa.zulugame.game.models.baseclasses.APlace;
+import productions.pa.zulugame.game.parser.Answer;
+import productions.pa.zulugame.game.parser.Command;
 import productions.pa.zulugame.game.parser.HitWord;
-import productions.pa.zulugame.game.parser.HitWordType;
-import productions.pa.zulugame.game.parser.ParsedInput;
 import productions.pa.zulugame.game.parser.Parser;
-import productions.pa.zulugame.game.story.PersonManager;
-import productions.pa.zulugame.game.story.RoomManager;
-import productions.pa.zulugame.game.story.RiddleManager;
 
 /**
  * Created by Andrey on 08.10.2015.
+ *
+ * Main class of the game.
+ * Main function: processing command and returning the answer to the UI
+ *
  */
 public class Game implements InputCallback {
 
+    //  ------------------------------------------------------------
+    //  STATIC FINAL FIELDS
+    //  ------------------------------------------------------------
 
-    static UIHandler messageCallback;
-
+    static final String TAG = "Game";
+    //  ------------------------------------------------------------
+    //  FIELDS
+    //  ------------------------------------------------------------
+    /**
+     * @param mThis singleton of the Game to be accessible from anywhere
+     * @param myPrinter the Handler to process the Text to the UI
+     * @param status the current game-status
+     * */
+    static Game mThis;
+    UIHandler myPrinter;
     Gamestatus status = Gamestatus.NOT_STARTED;
 
+    //  ============================================================
+    //  CONSTRUCTOR ITEMS
+    //  ============================================================
 
-    ArrayList<String> list = new ArrayList<>();
-
-    public Game(UIHandler messageCallback) {
-        this.messageCallback = messageCallback;
-
-
+    /**
+     * Must be called first to init UI callback*/
+    public Game(UIHandler printer) {
+        mThis = this;
+        this.myPrinter = printer;
         //Let the user know, that the game is ready to start
-        messageCallback.onMessageReceived(MessageFactory.MESSAGE_WELCOME_GAME);
+        pushAnswer(new Answer(MessageFactory.MESSAGE_WELCOME_GAME, Answer.DECORATION.STATUS_CHANGE));
     }
 
-    public static SharedPreferences getSharedPrefs() {
-        return ((Activity) messageCallback).getSharedPreferences("sp", Context.MODE_PRIVATE);
+    public static Game getInstance() {
+        return mThis;
     }
 
+    //  ============================================================
+    //  @Override METHODS
+    //  ============================================================
 
     @Override
     public void onInputString(String input) {
-        ParsedInput parsedInput = Parser.parseInputMessage(input);
+        //  Show what user was written on the UI
+        myPrinter.onMessageReceived(input, Answer.DECORATION.PLAYER_MESSAGE_REPEAT);
 
-        List<HitWord> myParsedCommands = parsedInput.getAllHitwordsFound();
-
-        //check if we have understood anything
-        if (myParsedCommands.size() == 0) {
-            messageCallback.onErrorReceived(
-                    "Message completely not understandable:\n[" + parsedInput.getOriginalString() + "]");
-            //Stop executing
-            return;
-        }
 
         //Get the command out of the parsed input
-        Command command = parsedInput.createCommand();
+        Command command = Parser.parseInputMessage(input);
 
-        // Check whether the command is defined or not
-        if (command.getType().equals(HitWordType.UNKNOWN)) {
-            messageCallback.onErrorReceived(
-                    "The command is not known: [" + parsedInput.getOriginalString() + "]");
+        // Check whether the commands are defined or not
+        if (command.getType().equals(HitWord.TYPE.UNKNOWN)) {
+            pushAnswer(new Answer("The command is not known: [" + command.getTypedCommand() + "]", Answer.DECORATION.ERROR));
             //Stop executing
             return;
         }
-
-        if(command.getType().equals(HitWordType.ANSWER)){
-            Answer answer = RiddleManager.get().processAnswer(command);
-            if(answer.getAnswerTypes()[0].equals(Answer.TYPE.ITEM_NOT_FOUND)) {
-                processCommand(command);
-            }
-        }
-
         processCommand(command);
-
     }
 
 
-    private void processCommand(Command command) {
+    //  ============================================================
+    //  GETTERS / FINDERS
+    //  ============================================================
 
-        //Process a help or info command
-        if(processSudoCommand(command))return;
 
+    public SharedPreferences getSharedPrefs() {
+        return myPrinter.getContext().getSharedPreferences(TAG, Context.MODE_PRIVATE);
+    }
+
+
+
+    //  ============================================================
+    //  PRIVATE / PROTECTED METHODS
+    //  ============================================================
+
+    /**
+     * Main command processor and filter function*/
+    private boolean processCommand(Command command) {
+
+        if(command == null) return false;
+
+        Answer answer = null;
+        //  Process a help or info command
+        if (processSettingsSudoCommand(command)) return true;
+        if (processPersonCommand(command))return true;
+
+        //  Reject if game not started
         if (status.equals(Gamestatus.NOT_STARTED)) {
-            messageCallback.onMessageReceived(MessageFactory.MESSAGE_ENTER_START);
-            return;
+            return pushAnswer(new Answer(MessageFactory.MESSAGE_ENTER_START, Answer.DECORATION.STATUS_CHANGE));
+
+        }
+        //  Reject if game is over
+        if (status.equals(Gamestatus.OVER)) {
+            return pushAnswer(new Answer("Your game is over, please type 'start' to start a new game", Answer.DECORATION.STATUS_CHANGE));
         }
 
-        APlace place = RoomManager.get().getCurrentPlace();
-
-        Answer answer = place.processCommand(command);
-
-        if(answer == null ){
-            messageCallback.onErrorReceived("Action not found: " + command.getString());
-            return;
-        }
-        if(answer.getAnswerTypes()[0] == Answer.TYPE.FAIL && TextUtils.isEmpty(answer.getMessage())){
-            processFail(answer);
+        //  Check command by current context, if not search in the room
+        if (ContextManager.get().getCurrentcontext() != null) {
+            Log.i(TAG, "Context found : " + ContextManager.get().getCurrentcontext().getName());
+            answer = ContextManager.get().getCurrentcontext().processCommand(command);
+            if(answer != null && !answer.getDecorationType().equals(Answer.DECORATION.ERROR))return pushAnswer(answer);
         }
 
-        if(processPersonCommand(command))return;
-        processOutput(answer);
+        //  Try in the room
+        answer = RoomManager.get().getCurrentPlace().processCommand(command);
 
+        if (answer == null) {
+            return pushAnswer(new Answer("\nAction not found:\n" + command.getString(), Answer.DECORATION.ERROR));
+        }
+
+        return pushAnswer(answer);
     }
 
-    private boolean processSudoCommand(Command command) {
+    /**
+     * Checks if the command is
+     *  1. game-status-irrelevant (like start a game of help message)
+     *  2.  answer to a riddle*/
+    private boolean processSettingsSudoCommand(Command command) {
         switch (command.getType()) {
             case SETTINGS:
-                if (command.getPointer() != null) {
-                    switch (command.getPointer().getString()){
-                        case HitWord.NAME:
-                            if(command.getAttribute() != null) {
-                                PersonManager.get().saveUserName(command.getAttribute().getString());
-                                messageCallback.onMessageReceived("Your name has been changed to " + command.getAttribute().getString());
-                                return true;
-                            }
-                            break;
+                Log.d(TAG, "Processing Sudo command");
+                switch (command.getPointer().toLowerCase()) {
+                    case HitWord.NAME:
+                        if (!TextUtils.isEmpty(command.getAttribute())) {
+                            PersonManager.get().saveUserName(command.getAttribute());
+                            return pushAnswer(new Answer("Your name has been changed to " + command.getAttribute(), Answer.DECORATION.SETTINGS));
+                        }
+                        return true;
 
-                    }
+                    case HitWord.ANSWER:
+                        Log.d(TAG, "Answer");
+                        command.setType(HitWord.TYPE.ANSWER);
+                        return pushAnswer(RiddleManager.get().processCommand(command));
                 }
+
                 break;
 
             case SUDO:
-                if (command.getAction() != null) {
-                    switch (command.getAction().getString()) {
-                        case HitWord.INFO:
-                            messageCallback.clearScreen();
-                            messageCallback.onMessageReceived(getCurrentInfo());
-                            return true;
-                        case HitWord.HELP:
-                            //this functions creates a pop-up dialog and show the help message
-                            DialogFactory.createDialog((Context) messageCallback, DialogFactory.TITLE_HELP, MessageFactory.getHelpMessage());
-                            messageCallback.onMessageReceived("");
-                            return true;
-                        case HitWord.START:
-                            startGame();
-                            return true;
+                if (TextUtils.isEmpty(command.getAttribute())) {
+                    if (command.hasActionOf(HitWord.INFO)) {
+                        pushAnswer(new Answer(getCurrentInfo(), Answer.DECORATION.ROOM_DESCRIPTION));
+                        return true;
+                    }
+                    //this functions creates a pop-up dialog and show the help message
+                    if (command.hasActionOf(HitWord.HELP)) {
+
+                        myPrinter.clearScreen();
+                        myPrinter.onMessageReceived(MessageFactory.getHelpMessage());
+                        return true;
+                    }
+                    if (command.hasActionOf(HitWord.START)) {
+                        changeGameStatus(Gamestatus.RUNNING);
+                        return true;
                     }
                 }
                 break;
 
+
         }
         return false;
     }
 
+    /**
+     * Checks quick command to observe player*/
     private boolean processPersonCommand(Command command) {
-
-        String attribute = command.getAttribute().getString();
-        if(command.getAction().getString().equalsIgnoreCase(HitWord.OPEN) || command.getAction().getString().equalsIgnoreCase(HitWord.SHOW)) {
+        if (command.hasActionOf(HitWord.SHOW, HitWord.INFO)) {
             // BACKPACK
-            if (attribute.equalsIgnoreCase(HitWord.ITEM_BACKACK)) {
-                messageCallback.onMessageReceived(PersonManager.get().getPerson().getBackpack().getDescription());
-                return true;
+            if (command.hasAttributeOf(HitWord.BACKPACK)) {
+                ContextManager.get().setCurrentContext(PersonManager.get().getPerson().getBackpack());
+                return pushAnswer( new Answer(PersonManager.get().getPerson().getBackpack().getDescription(), Answer.DECORATION.BOX_ITEMS));
             }
-            if (command.getPointer().getString().equalsIgnoreCase(HitWord.ME)) {
-                messageCallback.onMessageReceived(PersonManager.get().getPerson().getDescription());
-                return true;
+            if (command.hasPointerOf(HitWord.ME)) {
+                ContextManager.get().setCurrentContext(PersonManager.get().getPerson());
+                return pushAnswer( new Answer(PersonManager.get().getPerson().getDescription(), Answer.DECORATION.BOX_ITEMS));
             }
         }
         return false;
     }
 
-    private void processFail(Answer answer) {
+    /**
+     * processes the answer to the UI,
+     * only this method should be used for that*/
 
-        if(answer.getAnswerTypes().length>1){
-            messageCallback.onMessageReceived(answer.getMessage());
-        }
-
-        messageCallback.onErrorReceived("Could not interact with the command");
-    }
-
-    private boolean processOutput(Answer answer) {
-        if(answer == null){
-            messageCallback.onErrorReceived("Answer is null");
+    private boolean pushAnswer(Answer answer) {
+        if (answer == null) {
+            myPrinter.onErrorReceived("Answer is null");
             return false;
         }
-        for(Answer.TYPE commands: answer.getAnswerTypes()){
-            switch (commands){
-                case SIMPLE_OUTPUT:
-                    messageCallback.onMessageReceived(answer.getMessage());
-                    return true;
 
-                case MOVE_TO_PLACE:
-                    if(RoomManager.get().moveAtPlace(answer.getContextId())){
-                        messageCallback.onMessageReceived(RoomManager.get().getCurrentPlace().getStory());
-                        return true;
-                    }
-            }
+        String message = answer.getMessage();
+        if(answer.getDecorationType().equals(Answer.DECORATION.ERROR)){
+            myPrinter.onErrorReceived(message);
+        }
+        else{
+            myPrinter.onMessageReceived(message,answer.getDecorationType());
         }
 
-        return false;
-    }
-
-    private void startGame() {
-        //TODO
-        status = Gamestatus.RUNNING;
-        messageCallback.clearScreen();
-        messageCallback.onMessageReceived(RoomManager.get().getCurrentPlace().getStory());
+        return true;
     }
 
 
+
+    /**
+     * @return The description of the current room, checks if the game has started
+     * */
     public String getCurrentInfo() {
         //TODO
-        if (status == null || status.equals(Gamestatus.NOT_STARTED)) return MessageFactory.MESSAGE_ENTER_START;
+        if (status == null || status.equals(Gamestatus.NOT_STARTED))
+            return MessageFactory.MESSAGE_ENTER_START;
         APlace place = RoomManager.get().getCurrentPlace();
         if (place != null) {
             return place.getDescription();
@@ -219,10 +240,51 @@ public class Game implements InputCallback {
         return "no info";
     }
 
-    enum Gamestatus{
+    /**
+     * Sets the current status and triggers the actions
+     * @param status */
+    public void changeGameStatus(Gamestatus status, String... messages) {
+
+        Answer answer = new Answer("Game status:" + status.name(), Answer.DECORATION.STATUS_CHANGE);
+        switch (status) {
+
+            case OVER:
+                answer.addMessage(MessageFactory.GAME_OVER + Statistic.getCurrent().getString());
+                break;
+            case RUNNING:
+                answer.addMessage(startGame().getMessage());
+                break;
+        }
+        for(String message:messages)if(!TextUtils.isEmpty(message))answer.addMessage(message);
+        pushAnswer(answer);
+
+        this.status = status;
+    }
+
+    /**
+     * init everything for a new game*/
+    private Answer startGame() {
+        //TODO
+        if (status.equals(Gamestatus.OVER)) {
+
+        }
+        if (status.equals(Gamestatus.RUNNING)) {
+            return new Answer("You are already running a game", Answer.DECORATION.SIMPLE);
+        }
+        if (status.equals(Gamestatus.NOT_STARTED)) {
+            status = Gamestatus.RUNNING;
+            myPrinter.clearScreen();
+            Statistic.getNewInstance();
+            return new Answer(RoomManager.get().getCurrentPlace().getStory(), Answer.DECORATION.STATUS_CHANGE);
+
+        }
+        return new Answer("startGame Error", Answer.DECORATION.ERROR);
+    }
+
+
+    public enum Gamestatus {
         NOT_STARTED,
         RUNNING,
-        PAUSE,
         OVER
     }
 }

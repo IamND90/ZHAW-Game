@@ -2,7 +2,10 @@ package productions.pa.zulugame.android;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,42 +18,46 @@ import productions.pa.zulugame.R;
 import productions.pa.zulugame.game.Game;
 import productions.pa.zulugame.output.Printer;
 
-public class MainActivity extends AppCompatActivity implements UIHandler,View.OnKeyListener {
+public class MainActivity extends AppCompatActivity {
 
     static final String SHAREDPREFS  = "sprefs";
     static final String BOOL_OPEN_DEBUG  = "debugopen";
 
     TextView textOutput;
-    TextView textError;
     EditText textInput;
-    ImageButton buttonEnterCommand;
+
 
     Game myGame;
-
-    Printer printer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         textOutput = (TextView) findViewById(R.id.textOutput);
         textInput = (EditText) findViewById(R.id.textInput);
-        textError = (TextView) findViewById(R.id.textError);
 
-        buttonEnterCommand = (ImageButton) findViewById(R.id.imageButton);
-
-        printer = new Printer(this,textOutput);
-        myGame = new Game(this);
-
-        buttonEnterCommand.setOnClickListener(new View.OnClickListener() {
+        textInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View v) {
-                handleInput();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if( textInput.getText().toString().endsWith("\n")){
+                    handleInput();
+                }
             }
         });
-        textInput.setOnKeyListener(this);
 
+        myGame = new Game(new Printer(textOutput));
 
 
     }
@@ -58,7 +65,14 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
     private void handleInput() {
         //Get the input string and ceck if its not empty
         String text = textInput.getText().toString();
+        if(text.equals("\n")){
+            textInput.setText("");
+            return;
+        }
+        if(text.length() >= 2 &&text.endsWith("\n")) text = text.substring(0,text.length()-1);
+
         if(TextUtils.isEmpty(text)) return;
+        textInput.setText("");
 
         myGame.onInputString(text);
     }
@@ -86,53 +100,4 @@ public class MainActivity extends AppCompatActivity implements UIHandler,View.On
         return super.onOptionsItemSelected(item);
     }
 
-
-
-    @Override
-    public void onMessageReceived(String message) {
-        String text = textOutput.getText().toString();
-        if(printer == null) return;
-
-        if(TextUtils.isEmpty(message))printer.clear();
-        else
-            printer.print(message);
-
-        textInput.setText("");
-        textError.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onErrorReceived(String message) {
-        textError.setText(message);
-        textError.setVisibility(View.VISIBLE);
-    }
-
-    /*
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-        if(keyCode == KeyEvent.KEYCODE_ENTER){
-            handleInput();
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    */
-
-    @Override
-    public void clearScreen() {
-        onMessageReceived(null);
-    }
-
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                (keyCode == KeyEvent.KEYCODE_ENTER)) {
-            // Perform action on key press
-            handleInput();
-            textInput.setText("");
-            return true;
-        }
-        return false;
-    }
 }
