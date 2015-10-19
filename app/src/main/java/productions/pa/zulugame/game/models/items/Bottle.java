@@ -19,7 +19,8 @@ public class Bottle extends AItem {
 
     /**
      * @param fullLife the amout of life in the bottle when created
-     * @param lifeLeft amount of life left in the bottle*/
+     * @param lifeLeft amount of life left in the bottle
+     */
     final int fullLife;
     int lifeLeft;
 
@@ -55,23 +56,26 @@ public class Bottle extends AItem {
     public String getDescription() {
         return "Contains [" + lifeLeft + "] life points";
     }
+
     /**
      * Handler the alternative functions of a command , for more information
      * goto base-function @AModel (super.processCommand)
      */
     @Override
     public Answer processCommand(Command command) {
-        if (command.hasActionOf(HitWord.USE)) {
-            if(lifeLeft <=0){
-                return new Answer("Bottle is empty", Answer.DECORATION.FAIL);
+        if(command.hasAttributeOf(getName(),getType().name())) {
+            if (command.hasActionOf(HitWord.USE)) {
+                if (lifeLeft <= 0) {
+                    return new Answer("Bottle is empty", Answer.DECORATION.FAIL);
+                }
+                int healedBy = PersonManager.get().getPerson().appendLife(lifeLeft);
+                if (healedBy != lifeLeft) {
+                    //  Set new life munt in bottle
+                    lifeLeft -= healedBy;
+                    return new Answer("Your life is full", Answer.DECORATION.SIMPLE);
+                }
+                return new Answer("Your life has been increased by " + healedBy, Answer.DECORATION.SIMPLE);
             }
-            int healedBy = PersonManager.get().getPerson().appendLife(lifeLeft);
-            if (healedBy != lifeLeft) {
-                //  Set new life munt in bottle
-                lifeLeft -= healedBy;
-                return new Answer("Your life is full", Answer.DECORATION.SIMPLE);
-            }
-            return new Answer("Your life has been increased by " + healedBy, Answer.DECORATION.SIMPLE);
         }
         return super.processCommand(command);
     }

@@ -1,5 +1,7 @@
 package productions.pa.zulugame.game.models.items;
 
+import android.util.Log;
+
 import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.Statistic;
 import productions.pa.zulugame.game.models.IModel;
@@ -17,6 +19,7 @@ import productions.pa.zulugame.game.parser.HitWord;
  */
 public class Backpack extends AModel {
 
+    private static final String TAG = "BackPack";
     //  ============================================================
     //  CONSTRUCTOR ITEMS
     //  ============================================================
@@ -72,14 +75,16 @@ public class Backpack extends AModel {
      * @return Answer to process on UI
      */
     public Answer addItem(IModel model) {
-
+        Log.i(TAG,"Trying to add item:"+model.getColor() + " " + model.getName() );
         AItem item = (AItem) model;
         if (getSpaceLeft() > item.getSpaceUsed()) {
             if (findByNameAndColor(item.getName(), item.getColor().name()) == null) {
                 getSubItems().add(item);
                 Statistic.getCurrent().itemFound(item);
+                Log.i(TAG, "Added item:" + model.getColor() + " " + model.getName());
                 return new Answer("Added " + item.getColor().name() + " " + item.getName() + " to backpack", Answer.DECORATION.ADDING);
             } else {
+                Log.i(TAG,"Item has double");
                 return new Answer("You cant have two items of the same color in your backpack", Answer.DECORATION.FAIL);
             }
         }

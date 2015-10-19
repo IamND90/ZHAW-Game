@@ -21,6 +21,7 @@ import productions.pa.zulugame.game.parser.HitWord;
  */
 public abstract class AModel implements IModel {
 
+    private static final String TAG = "AModel";
     //  ------------------------------------------------------------
     //  FIELDS
     //  ------------------------------------------------------------
@@ -163,6 +164,7 @@ public abstract class AModel implements IModel {
     }
 
     public IModel findByGroup(TYPE group) {
+
         for (IModel item : subItems) if (item.getGroup().equals(group)) return item;
         return null;
     }
@@ -174,7 +176,10 @@ public abstract class AModel implements IModel {
 
         for (IModel item : subItems) {
             IModel foundModel = ((AModel) item).findByNameAndColor(name, color);
-            if (foundModel != null) return foundModel;
+            if (foundModel != null){
+                Log.i(getName(),"Found by name and color" + item.getColor() + " " + item.getName());
+                return foundModel;
+            }
         }
 
         return null;
@@ -232,7 +237,7 @@ public abstract class AModel implements IModel {
             }
         }
 
-        if (command.hasAttributeOf(getType().name())) {
+        if (command.hasAttributeOf(getType().name(), getName())) {
             if (command.hasActionOf(HitWord.INFO, HitWord.SHOW)) {
                 IModel item;
                 Answer answer;

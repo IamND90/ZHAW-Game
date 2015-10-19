@@ -27,10 +27,10 @@ public class Door extends APlace {
     //  ------------------------------------------------------------
 
     /**
-     * @param keyColorNeededToOpen the color of the key that can open this door, is always the color of the door actually
-     * if null, not closed
+     * @param keyColorNeededToOpen the color of the key that can open this door, is always the color of the door actually. if null, not closed
      */
     private String keyColorNeededToOpen = null;
+    private int keyIdNeededToOpen =-1;
 
     //  ============================================================
     //  CONSTRUCTOR ITEMS
@@ -46,7 +46,7 @@ public class Door extends APlace {
         super(TYPE.DOOR);
         linkedPlaces.add(room1);
         linkedPlaces.add(room2);
-        keyColorNeededToOpen = closeKey.getColor().name();
+        keyIdNeededToOpen = closeKey.getId();
         setColor(closeKey.getColor());
     }
 
@@ -103,11 +103,16 @@ public class Door extends APlace {
         if (isClosed()) {
             IModel key = PersonManager.get().getPerson().getBackpack().findByNameAndColor(HitWord.KEY, getColor().name());
             if (key != null) {
-                if (key.getColor().name().equalsIgnoreCase(keyColorNeededToOpen)) {
-                    //Remove the key from backpack because used
-                    PersonManager.get().getPerson().getBackpack().removeItemById(key.getId());
-                    keyColorNeededToOpen = null;
-                    return true;
+                if(keyColorNeededToOpen != null) {
+                    if (key.getColor().name().equalsIgnoreCase(keyColorNeededToOpen)) {
+                        //Remove the key from backpack because used
+                        PersonManager.get().getPerson().getBackpack().removeItemById(key.getId());
+                        keyColorNeededToOpen = null;
+                        return true;
+                    }
+                }
+                if(keyIdNeededToOpen >= 0){
+                    //TODO
                 }
                 return false;
             }
@@ -135,7 +140,7 @@ public class Door extends APlace {
     }
 
     public boolean isClosed() {
-        return keyColorNeededToOpen == null ? false : true;
+        return (keyColorNeededToOpen == null && keyIdNeededToOpen < 0) ? false : true;
     }
 
     /**
