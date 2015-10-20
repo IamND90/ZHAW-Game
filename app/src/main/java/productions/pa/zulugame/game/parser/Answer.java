@@ -71,7 +71,7 @@ public class Answer {
         FAIL,
         ERROR,
 
-        PLAYER_MESSAGE_REPEAT
+        PLAYER_MESSAGE_ECHO
 
     }
 }

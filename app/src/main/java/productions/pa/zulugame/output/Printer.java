@@ -157,7 +157,7 @@ public class Printer implements UIHandler{
             case ERROR:
                 message = addSideDecoration(message, ">ERR>");
                 break;
-            case PLAYER_MESSAGE_REPEAT:
+            case PLAYER_MESSAGE_ECHO:
                 message = "<" + PersonManager.get().getUserName()+ ">" + ": \"" + message + "\"";
                 break;
         }

@@ -1,11 +1,14 @@
 package productions.pa.zulugame.game.models.baseclasses;
 
+import android.text.TextUtils;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.manager.RoomManager;
 import productions.pa.zulugame.game.models.Box;
-import productions.pa.zulugame.game.models.IModel;
 import productions.pa.zulugame.game.models.items.Key;
 import productions.pa.zulugame.game.models.places.Door;
 import productions.pa.zulugame.game.parser.Answer;
@@ -187,8 +190,18 @@ public abstract class ARoom extends APlace {
         if (command.hasActionOf(HitWord.OPEN, HitWord.ENTER)) {
             // OPEN THE DOOR
             if (command.hasAttributeOf(HitWord.DOOR)) {
-                Door door = findDoorByColor(command.getPointer());
-                if (door == null && linkedPlaces.size() > 0) door = (Door) linkedPlaces.get(0);
+                Door door;
+                if(command.hasPointer() && linkedPlaces.size() > 1) {
+                    return new Answer("Multiple items found, please specify color.", Answer.DECORATION.FAIL);
+                }
+                else if(command.hasPointer()){
+                    door = findDoorByColor(command.getPointer());
+                }
+                else{
+                    return new Answer("Multiple Doors in this room, plase specify", Answer.DECORATION.FAIL);
+                }
+
+                //if (door == null && linkedPlaces.size() > 0) door = (Door) linkedPlaces.get(0);
                 Log.i(TAG, "Is door: " + door == null ? "null" : "");
                 if (door != null) {
                     if (door.openDoor()) {
@@ -234,6 +247,8 @@ public abstract class ARoom extends APlace {
     }
 
 
+
+
     @Override
     public String getDescription() {
         String description = "\tThis room contains:";
@@ -266,12 +281,7 @@ public abstract class ARoom extends APlace {
     }
 
     private Answer moveTo(APlace nextPlace) {
-        if (RoomManager.get().moveAtPlace(nextPlace.getId())) {
-            return new Answer("Moving from [" + getName() + "] to ["
-                    + nextPlace.getName() + "]"
-                    , Answer.DECORATION.SIMPLE);
-        }
-        return new Answer("Error at moving between rooms", Answer.DECORATION.ERROR);
+        return RoomManager.get().moveAtPlace(nextPlace.getId()) ;
     }
 
     protected boolean addDoor(Door door) {
@@ -310,6 +320,7 @@ public abstract class ARoom extends APlace {
         }
         return null;
     }
+
 
 
 }

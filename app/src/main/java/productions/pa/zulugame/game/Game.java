@@ -67,7 +67,7 @@ public class Game implements InputCallback {
     @Override
     public void onInputString(String input) {
         //  Show what user was written on the UI
-        myPrinter.onMessageReceived(input, Answer.DECORATION.PLAYER_MESSAGE_REPEAT);
+        myPrinter.onMessageReceived(input, Answer.DECORATION.PLAYER_MESSAGE_ECHO);
 
         //Get the command out of the parsed input
         Command command = Parser.parseInputMessage(input);

@@ -4,7 +4,7 @@ import android.util.Log;
 
 import productions.pa.zulugame.game.MessageFactory;
 import productions.pa.zulugame.game.Statistic;
-import productions.pa.zulugame.game.models.IModel;
+import productions.pa.zulugame.game.models.baseclasses.IModel;
 import productions.pa.zulugame.game.models.baseclasses.AItem;
 import productions.pa.zulugame.game.models.baseclasses.AModel;
 import productions.pa.zulugame.game.parser.Answer;

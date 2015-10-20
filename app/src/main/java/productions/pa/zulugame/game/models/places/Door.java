@@ -6,7 +6,7 @@ import java.util.List;
 import productions.pa.zulugame.game.manager.ContextManager;
 import productions.pa.zulugame.game.manager.PersonManager;
 import productions.pa.zulugame.game.manager.RoomManager;
-import productions.pa.zulugame.game.models.IModel;
+import productions.pa.zulugame.game.models.baseclasses.IModel;
 import productions.pa.zulugame.game.models.baseclasses.APlace;
 import productions.pa.zulugame.game.models.baseclasses.ARoom;
 import productions.pa.zulugame.game.models.items.Key;

@@ -1,6 +1,5 @@
 package productions.pa.zulugame.game.models.baseclasses;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -8,7 +7,6 @@ import java.util.List;
 
 import productions.pa.zulugame.game.manager.ContextManager;
 import productions.pa.zulugame.game.manager.PersonManager;
-import productions.pa.zulugame.game.models.IModel;
 import productions.pa.zulugame.game.models.items.Backpack;
 import productions.pa.zulugame.game.parser.Answer;
 import productions.pa.zulugame.game.parser.Command;

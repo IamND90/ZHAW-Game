@@ -8,7 +8,7 @@ import productions.pa.zulugame.game.Statistic;
 import productions.pa.zulugame.game.manager.ContextManager;
 import productions.pa.zulugame.game.manager.PersonManager;
 import productions.pa.zulugame.game.manager.RiddleManager;
-import productions.pa.zulugame.game.models.IModel;
+import productions.pa.zulugame.game.models.baseclasses.IModel;
 import productions.pa.zulugame.game.models.baseclasses.AItem;
 import productions.pa.zulugame.game.parser.Answer;
 import productions.pa.zulugame.game.parser.Command;

@@ -1,4 +1,4 @@
-package productions.pa.zulugame.game.models;
+package productions.pa.zulugame.game.models.baseclasses;
 
 import android.util.Log;
 
@@ -67,25 +67,25 @@ public interface IModel {
 
     int NOT_A_NUMBER= -23423;
 
-    int MAXIMUM_LIFE_PERSON = 100;
-    int START_LIFE_PERSON = 64;
+    int MAXIMUM_LIFE_PERSON = 86;
+    int START_LIFE_PERSON = 55;
 
-    int MAXIMUM_LIFE_BOTTLE = 54;
-    int MINIMUM_LIFE_BOTTLE = 12;
+    int MAXIMUM_LIFE_BOTTLE = 21;
+    int MINIMUM_LIFE_BOTTLE = 8;
 
-    int SPACE_BACPACK = 100;
-    int SPACE_KEY = 14;
-    int SPACE_RIDDLE = 23;
-    int SPACE_BOTTLE = 44;
+    int SPACE_BACPACK = 55;
+    int SPACE_KEY = 8;
+    int SPACE_RIDDLE = 13;
+    int SPACE_BOTTLE = 21;
 
     int LIFE_USED_MOVE_BETWEEN_ROOMS = -8;
-    int LIFE_USED_OPEN_BOX = -3;
+    int LIFE_USED_OPEN_BOX = -5;
 
-    int RIDDLE_DIFFICULTY_1= 12;
-    int RIDDLE_DIFFICULTY_2= 21;
-    int RIDDLE_DIFFICULTY_3= 37;
-    int RIDDLE_DIFFICULTY_4= 56;
-    int RIDDLE_DIFFICULTY_5= 71;
+    int RIDDLE_DIFFICULTY_1= 5;
+    int RIDDLE_DIFFICULTY_2= 8;
+    int RIDDLE_DIFFICULTY_3= 13;
+    int RIDDLE_DIFFICULTY_4= 21;
+    int RIDDLE_DIFFICULTY_5= 34;
 
     /**
      * The type and/or group of the models*/

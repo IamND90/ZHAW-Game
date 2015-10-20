@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import productions.pa.zulugame.game.models.baseclasses.IModel;
 import productions.pa.zulugame.game.models.items.Backpack;
 import productions.pa.zulugame.game.parser.Answer;
 import productions.pa.zulugame.game.parser.Command;
@@ -91,11 +92,13 @@ public class Box extends AModel {
             if (command.hasActionOf(HitWord.OPEN)) {
 
                 ContextManager.get().setCurrentContext(Box.this);
+                String message = "You opened the box ";
                 if(!hasBeenOpenes){
                     PersonManager.get().getPerson().appendLife(IModel.LIFE_USED_OPEN_BOX);
                     hasBeenOpenes = true;
+                    message += "and lost [" + IModel.LIFE_USED_OPEN_BOX + "] lifepoints:";
                 }
-                return new Answer("You opened the box:" + getDescription(), Answer.DECORATION.BOX_ITEMS);
+                return new Answer(message + getDescription(), Answer.DECORATION.BOX_ITEMS);
 
             }
         }

@@ -3,7 +3,7 @@ package productions.pa.zulugame.game.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import productions.pa.zulugame.game.models.IModel;
+import productions.pa.zulugame.game.models.baseclasses.IModel;
 import productions.pa.zulugame.game.models.items.Riddle;
 
 /**

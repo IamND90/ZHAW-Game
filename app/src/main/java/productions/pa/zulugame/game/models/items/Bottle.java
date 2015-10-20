@@ -1,5 +1,8 @@
 package productions.pa.zulugame.game.models.items;
 
+import android.os.SystemClock;
+import android.util.Log;
+
 import java.util.Random;
 
 import productions.pa.zulugame.game.manager.PersonManager;
@@ -37,7 +40,8 @@ public class Bottle extends AItem {
 
     public Bottle() {
         super(TYPE.BOTTLE);
-        lifeLeft = new Random().nextInt() % MAXIMUM_LIFE_BOTTLE;
+        lifeLeft = Math.abs(new Random().nextInt()) % MAXIMUM_LIFE_BOTTLE;
+        Log.i("Bottle","Random:" + lifeLeft);
         if (lifeLeft < MINIMUM_LIFE_BOTTLE) lifeLeft = MINIMUM_LIFE_BOTTLE;
         fullLife = lifeLeft;
         spaceUsed = SPACE_BOTTLE;

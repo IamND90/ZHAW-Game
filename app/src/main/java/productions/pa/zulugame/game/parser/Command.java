@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import productions.pa.zulugame.game.models.IModel;
+import productions.pa.zulugame.game.models.baseclasses.IModel;
 
 import static productions.pa.zulugame.game.parser.HitWord.TYPE;
 

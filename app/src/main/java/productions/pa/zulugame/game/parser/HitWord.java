@@ -2,7 +2,7 @@ package productions.pa.zulugame.game.parser;
 
 import android.util.Log;
 
-import productions.pa.zulugame.game.models.IModel;
+import productions.pa.zulugame.game.models.baseclasses.IModel;
 
 /**
  * Created by Andrey on 08.10.2015.

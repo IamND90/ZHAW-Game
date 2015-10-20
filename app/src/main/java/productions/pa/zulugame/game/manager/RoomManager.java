@@ -5,7 +5,7 @@ import java.util.List;
 
 import productions.pa.zulugame.game.Statistic;
 import productions.pa.zulugame.game.models.Box;
-import productions.pa.zulugame.game.models.IModel;
+import productions.pa.zulugame.game.models.baseclasses.IModel;
 import productions.pa.zulugame.game.models.baseclasses.ARoom;
 import productions.pa.zulugame.game.models.items.Bottle;
 import productions.pa.zulugame.game.models.items.Key;
@@ -14,6 +14,7 @@ import productions.pa.zulugame.game.models.places.Door;
 import productions.pa.zulugame.game.models.places.RoomFinish;
 import productions.pa.zulugame.game.models.places.RoomStart;
 import productions.pa.zulugame.game.models.quests.RiddleFactory;
+import productions.pa.zulugame.game.parser.Answer;
 
 /**
  * Created by Andrey on 09.10.2015.
@@ -193,10 +194,11 @@ public class RoomManager {
      * @return false if no place is not connected to it
      */
 
-    public boolean moveAtPlace(int toPlaceId) {
+    public Answer moveAtPlace(int toPlaceId) {
         ARoom place = findPlaceFromCurrentPlace(toPlaceId);
+        ARoom currentPlace =roomsWalkLine.get(currentRoom);
         //  If no connected place found, return false
-        if (place == null) return false;
+        if (place == null) return new Answer("Failed moving room");
 
         //  Move to next room or move back
         if (currentRoom == 0) {
@@ -224,7 +226,10 @@ public class RoomManager {
 
         //  set this place to discovered
         getCurrentPlace().setIsDiscovered(true);
-        return true;
+
+        return new Answer("Moving from [" + currentPlace.getName() + "] to ["
+                + place.getName() + "] and lost [" + IModel.LIFE_USED_MOVE_BETWEEN_ROOMS + "] life."
+                , Answer.DECORATION.ROOM_DESCRIPTION);
     }
 
     /**

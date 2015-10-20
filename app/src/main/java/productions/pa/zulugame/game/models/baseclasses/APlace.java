@@ -3,7 +3,6 @@ package productions.pa.zulugame.game.models.baseclasses;
 import java.util.ArrayList;
 import java.util.List;
 
-import productions.pa.zulugame.game.models.IModel;
 import productions.pa.zulugame.game.models.places.Door;
 
 /**
