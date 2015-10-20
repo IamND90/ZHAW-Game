@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import productions.pa.zulugame.game.Game;
 import productions.pa.zulugame.game.models.Person;
+import productions.pa.zulugame.game.models.items.Backpack;
 import productions.pa.zulugame.game.parser.HitWord;
 
 /**
@@ -43,6 +44,9 @@ public class PersonManager {
 
     public Person getPerson() {
         return mPerson;
+    }
+    public Backpack getBackPack() {
+        return mPerson.getBackpack();
     }
 
     /** loads the username from android memory

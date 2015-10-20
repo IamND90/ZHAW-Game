@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import productions.pa.zulugame.game.manager.ContextManager;
+import productions.pa.zulugame.game.manager.PersonManager;
 import productions.pa.zulugame.game.models.IModel;
+import productions.pa.zulugame.game.models.items.Backpack;
 import productions.pa.zulugame.game.parser.Answer;
 import productions.pa.zulugame.game.parser.Command;
 import productions.pa.zulugame.game.parser.HitWord;
@@ -25,6 +27,7 @@ public abstract class AModel implements IModel {
     //  ------------------------------------------------------------
     //  FIELDS
     //  ------------------------------------------------------------
+    int parentIndex = -1;
     final List<IModel> subItems = new ArrayList<>();
     /**
      * []
@@ -49,6 +52,7 @@ public abstract class AModel implements IModel {
         if (type.length == 1) mGroup = mType;
         else mGroup = type[1];
         color = COLOR.getRandom();
+        ContextManager.get().registerModel(this);
     }
 
     public AModel(COLOR color, TYPE... type) {
@@ -57,12 +61,26 @@ public abstract class AModel implements IModel {
         if (type.length == 1) mGroup = mType;
         else mGroup = type[1];
         this.color = color;
+        ContextManager.get().registerModel(this);
     }
 
+    public int getParentIndex() {
+        return parentIndex;
+    }
+    public void setParentIndex(int index){
+        parentIndex = index;
+    }
 
     //  ============================================================
     //  GETTERS / FINDERS
     //  ============================================================
+
+
+    @Override
+    public String getShortdescription() {
+        return "[" + getColor() + " " + getName() + "]";
+    }
+
     @Override
     public TYPE getType() {
         return mType;
@@ -93,37 +111,13 @@ public abstract class AModel implements IModel {
         this.color = color;
     }
 
-    protected AItem getItem(int id, TYPE type, String name) {
-        IModel found = null;
-        if (id > 0) {
-            for (IModel subModel : subItems) {
-                if (subModel.getId() == id) {
-                    found = subModel;
-                    break;
-                }
-            }
-        }
 
-        if (found != null && type != null) {
-            for (IModel subModel : subItems) {
-                if (subModel.getType().equals(type)) {
-                    found = subModel;
-                    break;
-                }
-            }
-        }
 
-        if (found == null && !TextUtils.isEmpty(name)) {
-            for (IModel subModel : subItems) {
-                if (subModel.getName().equals(name)) {
-                    found = subModel;
-                    break;
-                }
-            }
-        }
-
-        ContextManager.get().setCurrentContext(found);
-        return (AItem) found;
+    @Override
+    public boolean addModel(IModel item) {
+        ((AModel)item).setParentIndex(subItems.size());
+        subItems.add(item);
+        return true;
     }
 
     /**
@@ -131,10 +125,10 @@ public abstract class AModel implements IModel {
      */
     @Override
     public String getDescription() {
-        if (getSubItems().isEmpty()) return "";
+        if (subItems.isEmpty()) return "";
         String description = "This " + getName() + " contains " + getSubItems().size() + " things.";
 
-        for (IModel item : getSubItems()) {
+        for (IModel item : subItems) {
             description += ("\n" + item.getName());
         }
 
@@ -151,31 +145,37 @@ public abstract class AModel implements IModel {
      * The method names should speak for them self..
      */
 
-    public IModel findByTypes(String... types) {
+    public IModel findByTypeOrName(String... types) {
         for (String type : types) {
-            if (getType().name().equalsIgnoreCase(type)) return this;
+            if (getName().equalsIgnoreCase(type) || getType().name().equalsIgnoreCase(type)) return this;
 
             for (IModel item : subItems) {
-                IModel foundModel = ((AModel) item).findByTypes(type);
+                IModel foundModel = ((AModel) item).findByTypeOrName(type);
                 if (foundModel != null) return foundModel;
             }
         }
         return null;
     }
 
-    public IModel findByGroup(TYPE group) {
-
-        for (IModel item : subItems) if (item.getGroup().equals(group)) return item;
-        return null;
+    public List<IModel> findAllByTypeOrName(String... types) {
+        List<IModel> list = new ArrayList<>();
+        for (String type : types) {
+            for (IModel item : subItems) {
+                if (item.getName().equalsIgnoreCase(type) || item.getType().name().equalsIgnoreCase(type)) list.add(item);
+            }
+        }
+        return list;
     }
 
-    public IModel findByNameAndColor(String name, String color) {
 
-        if (getType().name().equalsIgnoreCase(name) && getColor().name().equalsIgnoreCase(color))
+    public IModel findByTypeAndColor(String name, String color) {
+
+        if (( getName().equalsIgnoreCase(name) || getType().name().equalsIgnoreCase(name))
+                        && getColor().name().equalsIgnoreCase(color)){
             return this;
-
+        }
         for (IModel item : subItems) {
-            IModel foundModel = ((AModel) item).findByNameAndColor(name, color);
+            IModel foundModel = ((AModel) item).findByTypeAndColor(name, color);
             if (foundModel != null){
                 Log.i(getName(),"Found by name and color" + item.getColor() + " " + item.getName());
                 return foundModel;
@@ -185,12 +185,12 @@ public abstract class AModel implements IModel {
         return null;
     }
 
-    public boolean removeItemByName(String name) {
-        if (getName().equalsIgnoreCase(name)) return true;
+
+    public boolean findById(int id) {
+        if (this.getId() == id) return true;
 
         for (int i = 0; i < subItems.size(); i++) {
-            if (((AModel) subItems.get(i)).removeItemByName(name)) {
-                subItems.remove(i);
+            if (subItems.get(i).findById(id)) {
                 return true;
             }
         }
@@ -228,68 +228,89 @@ public abstract class AModel implements IModel {
     @Override
     public Answer processCommand(Command command) {
 
+        IModel item;
+        Answer answer;
 
-        //  Check whether the command has a pointer or not
-        //  iIf pointing at not hits item, process further
-        if (!TextUtils.isEmpty(command.getPointer())) {
-            if (!command.getColor().equalsIgnoreCase(getColor().name())) {
-                return checkSubModels(command);
+        // Search by index
+        int numberTyped = command.getNumber();
+        if(numberTyped != NOT_A_NUMBER){
+            if(numberTyped == getParentIndex() && command.getColor().equals(getColor())){
+                answer=  processThisFound(command);
+                if (answer != null) return answer;
             }
+
+            if(numberTyped < getSubItems().size() && numberTyped >= 0 && getSubItems().size() >=0){
+                item = getSubItems().get(numberTyped);
+                answer  = item.processCommand(command);
+                if(answer != null)return answer;
+            }
+
         }
 
+        //  Search by name
         if (command.hasAttributeOf(getType().name(), getName())) {
-            if (command.hasActionOf(HitWord.INFO, HitWord.SHOW)) {
-                IModel item;
-                Answer answer;
-
-                if (ContextManager.get().getCurrentcontext().getId() == this.getId() && TextUtils.isEmpty(command.getAttribute())) {
-                    return new Answer(getDescription(), Answer.DECORATION.DESCRIPTION);
-                } else {
-                    if (getSubItems().size() > 1)
-                        item = findByNameAndColor(command.getAttribute(), command.getPointer());
-                    else item = findByTypes(command.getAttribute());
-                    if (item != null) {
-                        ContextManager.get().setCurrentContext(this);
-                        return new Answer(item.getDescription(), Answer.DECORATION.DESCRIPTION);
-                    }
-                    item = ContextManager.get().getCurrentcontext();
-                    if (item != null && item.getId() != getId()) {
-                        ContextManager.get().setCurrentContext(item);
-                        return new Answer(item.getDescription(), Answer.DECORATION.DESCRIPTION);
-                    }
-
-                }
-            }
+            answer=  processThisFound(command);
+            if (answer != null) return answer;
         }
+
+
         return checkSubModels(command);
     }
+
+    private Answer processThisFound(Command command) {
+        Log.i(TAG,"Command found: " + getName() + " " + getColor().name() + " " + getType().name());
+        Answer answer = null;
+        if (command.hasActionOf(HitWord.INFO, HitWord.SHOW)) {
+            ContextManager.get().setCurrentContext(this);
+            return new Answer(this.getDescription(), Answer.DECORATION.DESCRIPTION);
+        }
+        if (command.hasActionOf(HitWord.DROP,HitWord.REMOVE)) {
+            return dropItem(this);
+        }
+        if (command.hasActionOf(HitWord.TAKE,HitWord.STORE)) {
+            return PersonManager.get().getBackPack().addItem(this);
+        }
+
+        return null;
+    }
+
+    private Answer dropItem(IModel model) {
+
+        Backpack backpack = PersonManager.get().getPerson().getBackpack();
+
+        if(backpack.findById(model.getId())){
+            return new Answer("You dropped " + model.getShortdescription(), Answer.DECORATION.SIMPLE);
+        }
+        else return new Answer("You dont have "+ model.getShortdescription() + " in your backpack", Answer.DECORATION.FAIL);
+
+    }
+
 
     private Answer checkSubModels(Command command) {
         Answer answer = null;
         if (subItems == null) {
-            return new Answer("No subitems found", Answer.DECORATION.ERROR);
+            return null;
         }
-        //  Filter the models with the possible attribute
-        List<IModel> validModels = new ArrayList<>();
-        for (IModel subModel : subItems) {
-            String searchName = subModel.getType().name();
 
-            if (command.hasAttributeOf(searchName)) {
-                validModels.add(subModel);
+        IModel item = null;
+        if(command.hasPointer())
+            item = findByTypeAndColor(command.getAttribute(), command.getPointer());
+        else {
+            List<IModel> items = findAllByTypeOrName(command.getAttribute());
+            if(items.size() > 1){
+                return new Answer("Multiple items found, please specify color.", Answer.DECORATION.FAIL);
+            }else if(items.size() != 0) {
+                item = items.get(0);
             }
         }
-        //  Check if there is only one model and no pointer given, so no pointer needed
-        if (validModels.size() == 1 && TextUtils.isEmpty(command.getPointer())) {
-            command.setPointer(validModels.get(0).getColor().name());
-            return validModels.get(0).processCommand(command);
-        }
-
-        for (IModel subModel : validModels) {
-            Log.i("AModel", "Found submodel by attribute or name");
-            answer = subModel.processCommand(command);
+        if (item != null) {
+            if(item.getId() != getId()) {
+                answer = item.processCommand(command);
+                if (answer != null) return answer;
+            }else
+                answer =  processThisFound(command);
             if (answer != null) return answer;
         }
-
 
         return answer;
     }

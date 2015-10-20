@@ -16,21 +16,26 @@ import static productions.pa.zulugame.game.parser.HitWord.TYPE;
 public class Parser {
     private static final String TAG = "Parser";
 
+    final static List<HitWord> myHitwordsFound = new ArrayList<>();
+    static String originalString;
+
+
     public static Command parseInputMessage(String message) {
         Log.i(TAG, "Message:<" + message + ">");
+        myHitwordsFound.clear();
+        originalString = message;
         //TODO Split by "," to execute mutiple commands (removed feature, that's why this ParsedInput class)
         //create the instance to return
-        ParsedInput parsedInput = new ParsedInput(message);
 
         //  Checks if its a sudo command(look at hitwords), these commands are also processes when the game doesn't run
         String sudoSetting[] = message.split(":");
         if (sudoSetting.length == 2) {
             HitWord pointer = new HitWord(sudoSetting[0], TYPE.SETTINGS);
             HitWord attribute = new HitWord(sudoSetting[1], TYPE.SETTINGS);
-            parsedInput.addHitWord(pointer);
-            parsedInput.addHitWord(attribute);
+            myHitwordsFound.add(pointer);
+            myHitwordsFound.add(attribute);
 
-            return parsedInput.createCommand();
+            return createCommand();
         }
 
         // Split the input by TAB to get the single words
@@ -43,73 +48,56 @@ public class Parser {
             Log.i(TAG, "Search:<" + word + ">");
             HitWord foundHitword = HitWord.findHitWord(word);
             //Add to found array if it is a found word
-            if (!foundHitword.getType().equals(TYPE.NOT_FOUND))
-                parsedInput.addHitWord(foundHitword);
+            //if (!foundHitword.getType().equals(TYPE.NOT_FOUND))
+                myHitwordsFound.add(foundHitword);
         }
-        return parsedInput.createCommand();
+        return createCommand();
     }
 
-    /**
-     * this class stores the found words (in the mini-library @HitWord)
-     * and parses then to a Command
-     */
-    private static class ParsedInput {
-        final List<HitWord> myHitwordsFound = new ArrayList<>();
-        final String originalString;
+    public static Command createCommand() {
 
-        public ParsedInput(String original) {
-            originalString = original;
+        // 0:command, 1: pointer, 2: attribute
+        HitWord action = null;
+        HitWord pointer = null;
+        HitWord attribute = null;
+        TYPE type = TYPE.UNKNOWN;
+
+        //Search Command
+        for (HitWord hitword : myHitwordsFound) {
+            if (hitword.getType().equals(TYPE.SETTINGS) && myHitwordsFound.size() == 2) {
+                return new Command(originalString, hitword.getType(), null, hitword, myHitwordsFound.get(1));
+            }
         }
 
-        public void addHitWord(HitWord word) {
-            myHitwordsFound.add(word);
+
+        //Search What
+        for (HitWord hitword : myHitwordsFound) {
+            if (hitword.getType().equals(TYPE.SUDO) || hitword.getType().equals(TYPE.ACTING)) {
+                action = hitword;
+                type = action.getType();
+                break;
+            }
+        }
+        //Search Pointer
+        for (HitWord hitword : myHitwordsFound) {
+            if (hitword.getType().equals(TYPE.POINTER)) {
+                pointer = hitword;
+                if (type.equals(TYPE.UNKNOWN)) type = pointer.getType();
+                break;
+            }
+        }
+        //Search Attribute
+        for (HitWord hitword : myHitwordsFound) {
+            if (hitword.getType().equals(TYPE.ITEM) || hitword.getType().equals(TYPE.PLACE) || hitword.getType().equals(TYPE.NUMBER)) {
+                attribute = hitword;
+                if (type.equals(TYPE.UNKNOWN)) type = attribute.getType();
+                break;
+            }
+
         }
 
-        public Command createCommand() {
-
-            // 0:command, 1: pointer, 2: attribute
-            HitWord action = null;
-            HitWord pointer = null;
-            HitWord attribute = null;
-            TYPE type = TYPE.UNKNOWN;
-
-            //Search Command
-            for (HitWord hitword : myHitwordsFound) {
-                if (hitword.getType().equals(TYPE.SETTINGS) && myHitwordsFound.size() == 2) {
-                    return new Command(originalString, hitword.getType(), null, hitword, myHitwordsFound.get(1));
-                }
-            }
-
-
-            //Search What
-            for (HitWord hitword : myHitwordsFound) {
-                if (hitword.getType().equals(TYPE.SUDO) || hitword.getType().equals(TYPE.ACTING)) {
-                    action = hitword;
-                    type = action.getType();
-                    break;
-                }
-            }
-            //Search Pointer
-            for (HitWord hitword : myHitwordsFound) {
-                if (hitword.getType().equals(TYPE.POINTER)) {
-                    pointer = hitword;
-                    if (type.equals(TYPE.UNKNOWN)) type = pointer.getType();
-                    break;
-                }
-            }
-            //Search Attribute
-            for (HitWord hitword : myHitwordsFound) {
-                if (hitword.getType().equals(TYPE.ITEM) || hitword.getType().equals(TYPE.PLACE)) {
-                    attribute = hitword;
-                    if (type.equals(TYPE.UNKNOWN)) type = attribute.getType();
-                    break;
-                }
-            }
-
-            Command command = new Command(originalString, type, action, pointer, attribute);
-            Log.w("Parser", command.getString());
-            return command;
-        }
-
+        Command command = new Command(originalString, type, action, pointer, attribute);
+        Log.w("Parser", command.getString());
+        return command;
     }
 }

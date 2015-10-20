@@ -28,7 +28,7 @@ public class RoomFinish extends ARoom {
     @Override
     public String getStory() {
 
-        Game.getInstance().changeGameStatus(Game.Gamestatus.OVER,"You have won the game!");
+        Game.getInstance().changeGameStatus(Game.GameStatus.OVER,"You have won the game!");
 
         return STORY;
     }

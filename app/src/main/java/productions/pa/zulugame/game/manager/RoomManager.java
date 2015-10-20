@@ -41,7 +41,6 @@ public class RoomManager {
     final ARoom ROOM5;
     final ARoom ROOM6;
     final ARoom ROOM7;
-    final ARoom ROOM8;
     final ARoom START;
     final ARoom FINISH;
 
@@ -50,7 +49,7 @@ public class RoomManager {
     final Key KEY_RED;
     final Key KEY_GREEN;
     final Key KEY_YELLOW;
-
+    final Key KEY_ORANGE;
 
     final Box BOX0;
     final Box BOX1;
@@ -61,7 +60,7 @@ public class RoomManager {
     final Box BOX6;
     final Box BOX7;
     final Box BOX8;
-
+    final Box BOX_EMPTY;
     //  ------------------------------------------------------------
     //  FIELDS
     //  ------------------------------------------------------------
@@ -81,45 +80,44 @@ public class RoomManager {
     private RoomManager() {
 
         KEY_BLUE = Key.generateKey(IModel.COLOR.BLUE);
-        KEY_PURPLE = Key.generateKey(IModel.COLOR.ORANGE);
+        KEY_PURPLE = Key.generateKey(IModel.COLOR.PURPLE);
         KEY_RED = Key.generateKey(IModel.COLOR.RED);
         KEY_YELLOW = Key.generateKey(IModel.COLOR.YELLOW);
         KEY_GREEN = Key.generateKey(IModel.COLOR.GREEN);
+        KEY_ORANGE = Key.generateKey(IModel.COLOR.ORANGE);
 
-
+        BOX_EMPTY = new Box();
         BOX0 = new Box()
                 .addItem(KEY_RED)
-                .addItem(new Bottle())
-                .addItem(RiddleFactory.getTelephoneNumbers())
-                .addItem(RiddleFactory.getTime())
-                .addItem(Key.generateKey(IModel.COLOR.getRandomExclude(KEY_RED.getColor())));
+                .addItem(RiddleFactory.get1_1());
         BOX1 = new Box()
-                .addItem(KEY_YELLOW)
-                .addItem(new Bottle())
-                .addItem(RiddleFactory.getSand());
-        BOX2 = new Box()
-                .addItem(KEY_PURPLE)
                 .addItem(KEY_BLUE)
-                .addItem(RiddleFactory.getTriangle())
+                .addItem(new Bottle())
+                .addItem(RiddleFactory.get2_1());
+        BOX2 = new Box()
+                .addItem(KEY_YELLOW)
+                .addItem(KEY_BLUE)
+                .addItem(RiddleFactory.get2_2())
                 .addItem(new Bottle());
         BOX3 = new Box()
-                .addItem(new Bottle());
+                .addItem(KEY_GREEN)
+                .addItem(KEY_PURPLE)
+                .addItem(RiddleFactory.get4_1());
         BOX4 = new Box()
-                .addItem(new Bottle())
-                .addItem(Key.generateKey(IModel.COLOR.getRandom()))
-                .addItem(RiddleFactory.getNightmare());
+                .addItem(RiddleFactory.get3_1());
         BOX5 = new Box()
-                .addItem(RiddleFactory.getMailBox());
+                .addItem(KEY_ORANGE);
         BOX6 = new Box()
-                .addItem(RiddleFactory.getSkydive());
+                .addItem(new Bottle())
+                .addItem(RiddleFactory.get5_2())
+                .addItem(RiddleFactory.get4_2());
         BOX7 = new Box()
                 .addItem(new Bottle())
-                .addItem(Key.generateKey(IModel.COLOR.getRandom()));
+                .addItem(KEY_PURPLE);
         BOX8 = new Box()
-                .addItem(RiddleFactory.getTelephoneNumbers())
-                .addItem(KEY_GREEN)
-                .addItem(Key.generateKey(IModel.COLOR.getRandomExclude(KEY_GREEN.getColor())))
-                .addItem(new Bottle());
+                .addItem(RiddleFactory.get5_1())
+                .addItem(new Bottle())
+                .addItem(KEY_GREEN);
 
         START = new RoomStart()
                 .addBoxItem(BOX0);
@@ -128,6 +126,7 @@ public class RoomManager {
         ROOM2 = new CustomRoom("Jutenheim")
                 .addBoxItem(BOX2);
         ROOM3 = new CustomRoom("Canyon")
+                .addBoxItem(new Box())
                 .addBoxItem(BOX3);
         ROOM4 = new CustomRoom("Disneyland")
                 .addBoxItem(BOX4)
@@ -135,9 +134,9 @@ public class RoomManager {
         ROOM5 = new CustomRoom("Rainbowworld")
                 .addBoxItem(BOX6);
         ROOM6 = new CustomRoom("Altron")
+                .addBoxItem(new Box())
                 .addBoxItem(BOX7);
-        ROOM7 = new CustomRoom("Neptun");
-        ROOM8 = new CustomRoom("Uranus")
+        ROOM7 = new CustomRoom("Uranus")
                 .addBoxItem(BOX8);
         FINISH = new RoomFinish();
 
@@ -161,21 +160,19 @@ public class RoomManager {
     private void createTree() {
 
         START
-                .addBranch(ROOM2, KEY_RED)
-                .addBranch(ROOM3, KEY_BLUE)
+                .addBranch(ROOM2, KEY_RED.getColor())
+                .addBranch(ROOM3, KEY_BLUE.getColor())
                 .addBranch(ROOM1);
         ROOM3
-                .addBranch(ROOM4, KEY_YELLOW)
-                .addBranch(ROOM8);
+                .addBranch(ROOM4, KEY_YELLOW.getColor())
+                .addBranch(ROOM6,"red");
         ROOM4
-                .addBranch(ROOM5);
+                .addBranch(ROOM5, "blue");
         ROOM5
-                .addBranch(FINISH, KEY_PURPLE)
-                .addBranch(ROOM6);
-        ROOM6
-                .addBranch(ROOM7, KEY_GREEN);
-        ROOM7
-                .addBranch(ROOM8);
+                .addBranch(FINISH, KEY_ORANGE)
+                .addBranch(ROOM7, KEY_PURPLE.getColor())
+                .addBranch(ROOM6,KEY_GREEN.getColor());
+
     }
 
 

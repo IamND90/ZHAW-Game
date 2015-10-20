@@ -41,7 +41,7 @@ public class Game implements InputCallback {
      * */
     static Game mThis;
     UIHandler myPrinter;
-    Gamestatus status = Gamestatus.NOT_STARTED;
+    GameStatus status = GameStatus.NOT_STARTED;
 
     //  ============================================================
     //  CONSTRUCTOR ITEMS
@@ -68,7 +68,6 @@ public class Game implements InputCallback {
     public void onInputString(String input) {
         //  Show what user was written on the UI
         myPrinter.onMessageReceived(input, Answer.DECORATION.PLAYER_MESSAGE_REPEAT);
-
 
         //Get the command out of the parsed input
         Command command = Parser.parseInputMessage(input);
@@ -110,12 +109,12 @@ public class Game implements InputCallback {
         if (processPersonCommand(command))return true;
 
         //  Reject if game not started
-        if (status.equals(Gamestatus.NOT_STARTED)) {
+        if (status.equals(GameStatus.NOT_STARTED)) {
             return pushAnswer(new Answer(MessageFactory.MESSAGE_ENTER_START, Answer.DECORATION.STATUS_CHANGE));
 
         }
         //  Reject if game is over
-        if (status.equals(Gamestatus.OVER)) {
+        if (status.equals(GameStatus.OVER)) {
             return pushAnswer(new Answer("Your game is over, please type 'start' to start a new game", Answer.DECORATION.STATUS_CHANGE));
         }
 
@@ -123,7 +122,7 @@ public class Game implements InputCallback {
         if (ContextManager.get().getCurrentcontext() != null) {
             Log.i(TAG, "Context found : " + ContextManager.get().getCurrentcontext().getName());
             answer = ContextManager.get().getCurrentcontext().processCommand(command);
-            if(answer != null && !answer.getDecorationType().equals(Answer.DECORATION.ERROR))return pushAnswer(answer);
+            if(answer != null && !answer.getDecorationType().equals(Answer.DECORATION.ERROR) )return pushAnswer(answer);
         }
 
         //  Try in the room
@@ -174,7 +173,7 @@ public class Game implements InputCallback {
                         return true;
                     }
                     if (command.hasActionOf(HitWord.START)) {
-                        changeGameStatus(Gamestatus.RUNNING);
+                        changeGameStatus(GameStatus.RUNNING);
                         return true;
                     }
                 }
@@ -190,7 +189,7 @@ public class Game implements InputCallback {
     private boolean processPersonCommand(Command command) {
         if (command.hasActionOf(HitWord.SHOW, HitWord.INFO)) {
             // BACKPACK
-            if (command.hasAttributeOf(HitWord.BACKPACK)) {
+            if (command.hasAttributeOf(HitWord.BACKPACK,HitWord.BACKPACK_SHORT)) {
                 ContextManager.get().setCurrentContext(PersonManager.get().getPerson().getBackpack());
                 return pushAnswer( new Answer(PersonManager.get().getPerson().getBackpack().getDescription(), Answer.DECORATION.BOX_ITEMS));
             }
@@ -230,7 +229,7 @@ public class Game implements InputCallback {
      * */
     public String getCurrentInfo() {
         //TODO
-        if (status == null || status.equals(Gamestatus.NOT_STARTED))
+        if (status == null || status.equals(GameStatus.NOT_STARTED))
             return MessageFactory.MESSAGE_ENTER_START;
         APlace place = RoomManager.get().getCurrentPlace();
         if (place != null) {
@@ -243,7 +242,7 @@ public class Game implements InputCallback {
     /**
      * Sets the current status and triggers the actions
      * @param status */
-    public void changeGameStatus(Gamestatus status, String... messages) {
+    public void changeGameStatus(GameStatus status, String... messages) {
 
         Answer answer = new Answer("Game status:" + status.name(), Answer.DECORATION.STATUS_CHANGE);
         switch (status) {
@@ -265,14 +264,14 @@ public class Game implements InputCallback {
      * init everything for a new game*/
     private Answer startGame() {
         //TODO
-        if (status.equals(Gamestatus.OVER)) {
+        if (status.equals(GameStatus.OVER)) {
 
         }
-        if (status.equals(Gamestatus.RUNNING)) {
+        if (status.equals(GameStatus.RUNNING)) {
             return new Answer("You are already running a game", Answer.DECORATION.SIMPLE);
         }
-        if (status.equals(Gamestatus.NOT_STARTED)) {
-            status = Gamestatus.RUNNING;
+        if (status.equals(GameStatus.NOT_STARTED)) {
+            status = GameStatus.RUNNING;
             myPrinter.clearScreen();
             Statistic.getNewInstance();
             return new Answer(RoomManager.get().getCurrentPlace().getStory(), Answer.DECORATION.STATUS_CHANGE);
@@ -282,7 +281,7 @@ public class Game implements InputCallback {
     }
 
 
-    public enum Gamestatus {
+    public enum GameStatus {
         NOT_STARTED,
         RUNNING,
         OVER

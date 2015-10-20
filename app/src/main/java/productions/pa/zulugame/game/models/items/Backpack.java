@@ -20,12 +20,19 @@ import productions.pa.zulugame.game.parser.HitWord;
 public class Backpack extends AModel {
 
     private static final String TAG = "BackPack";
+    public static final int PARENT_INDEX = 0;
     //  ============================================================
     //  CONSTRUCTOR ITEMS
     //  ============================================================
 
     public Backpack() {
         super(TYPE.ITEM);
+        setParentIndex(PARENT_INDEX);
+    }
+
+    @Override
+    public int getParentIndex() {
+        return PARENT_INDEX;
     }
 
     //  ============================================================
@@ -57,12 +64,12 @@ public class Backpack extends AModel {
     @Override
     public Answer processCommand(Command command) {
 
+        Answer answer = null;
         //  Check if its empty, else process command down
-        if (command.hasActionOf(HitWord.USE)) {
+        if (command.hasActionOf(HitWord.USE, HitWord.GET,HitWord.SHOW)) {
             if (getSubItems().isEmpty()) {
                 return new Answer(MessageFactory.MESSAGE_BACKPACK_IS_EMPTY, Answer.DECORATION.FAIL);
             }
-
         }
 
         return super.processCommand(command);
@@ -75,11 +82,14 @@ public class Backpack extends AModel {
      * @return Answer to process on UI
      */
     public Answer addItem(IModel model) {
+        if(!model.getGroup().equals(TYPE.ITEM)) {
+            return new Answer("This is not an item, you can not store it.", Answer.DECORATION.FAIL);
+        }
         Log.i(TAG,"Trying to add item:"+model.getColor() + " " + model.getName() );
         AItem item = (AItem) model;
         if (getSpaceLeft() > item.getSpaceUsed()) {
-            if (findByNameAndColor(item.getName(), item.getColor().name()) == null) {
-                getSubItems().add(item);
+            if (findByTypeAndColor(item.getName(), item.getColor().name()) == null) {
+                addModel(item);
                 Statistic.getCurrent().itemFound(item);
                 Log.i(TAG, "Added item:" + model.getColor() + " " + model.getName());
                 return new Answer("Added " + item.getColor().name() + " " + item.getName() + " to backpack", Answer.DECORATION.ADDING);

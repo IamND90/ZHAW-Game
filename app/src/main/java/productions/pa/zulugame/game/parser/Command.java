@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import productions.pa.zulugame.game.models.IModel;
+
 import static productions.pa.zulugame.game.parser.HitWord.TYPE;
 
 /**
@@ -86,10 +88,21 @@ public class Command {
         return mPointer == null ? "" : mPointer.getString();
     }
 
-    public void setPointer(String pointer) {
-        mPointer = new HitWord(pointer, TYPE.POINTER);
+
+    public int getNumber(){
+        int number = IModel.NOT_A_NUMBER;
+        if(mAttribute.size() < 0){
+            try {
+                number = Integer.parseInt(mAttribute.get(0).getString());
+            }catch (Exception ex){
+                number = IModel.NOT_A_NUMBER;
+            }
+        }
+        return number;
     }
 
+
+    public boolean hasPointer(){return mPointer == null ? false : true;}
     public String getAttribute() {
         return mAttribute.isEmpty() ? "" : mAttribute.get(0).getString();
     }

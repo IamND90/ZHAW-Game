@@ -41,7 +41,7 @@ public abstract class ARoom extends APlace {
     /**
      * Adds a new Box to the room*/
     public ARoom addBoxItem(Box boxItem) {
-        getSubItems().add(boxItem);
+        addModel(boxItem);
         return this;
     }
 
@@ -63,6 +63,22 @@ public abstract class ARoom extends APlace {
         //auto find rghtn, not used colro in this room
         findColorForDoor(door);
 
+        if (addDoor(door))
+            place.addDoor(door);
+        return this;
+    }
+
+
+    /**
+     * Links another room to this
+     * Door is created with given color but not closed
+     * */
+    public ARoom addBranch(ARoom place,String doorColor) {
+        if (findRoomById(place.getId()) != null) {
+            Log.e(TAG, "You cant link a room twice:" + getId() + " and " + place.getId());
+            return this;
+        }
+        Door door = new Door(this, place,doorColor);
         if (addDoor(door))
             place.addDoor(door);
         return this;
@@ -184,6 +200,7 @@ public abstract class ARoom extends APlace {
                 }
                 return new Answer("No [" + command.getPointer() + "] door in this room!", Answer.DECORATION.FAIL);
             }
+
 
             // ENTER A ROOM BY COLOR
             if (command.hasAttributeOf(HitWord.ROOM)) {

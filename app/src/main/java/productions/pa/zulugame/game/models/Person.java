@@ -53,7 +53,7 @@ public class Person extends AModel {
 
 
     public Backpack getBackpack() {
-        return (Backpack) getSubItems().get(0);
+        return (Backpack) getSubItems().get(Backpack.PARENT_INDEX);
     }
 
     /**
@@ -70,7 +70,7 @@ public class Person extends AModel {
 
         if (lifeLeft <= 0) {
             // GAME OVER!!
-            Game.getInstance().changeGameStatus(Game.Gamestatus.OVER, "Your life is empty:" + lifeLeft);
+            Game.getInstance().changeGameStatus(Game.GameStatus.OVER, "Your life is empty:" + lifeLeft);
 
             return lifeLeft;
         }

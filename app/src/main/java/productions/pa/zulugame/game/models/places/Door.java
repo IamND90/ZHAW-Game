@@ -57,6 +57,12 @@ public class Door extends APlace {
         keyColorNeededToOpen = closeColor.name();
         setColor(closeColor);
     }
+    public Door(ARoom room1, ARoom room2, String doorColor) {
+        super(TYPE.DOOR);
+        linkedPlaces.add(room1);
+        linkedPlaces.add(room2);
+        setColor(COLOR.fromString(doorColor));
+    }
 
     //  ============================================================
     //  @Override METHODS
@@ -101,7 +107,7 @@ public class Door extends APlace {
 
         ContextManager.get().setCurrentContext(this);
         if (isClosed()) {
-            IModel key = PersonManager.get().getPerson().getBackpack().findByNameAndColor(HitWord.KEY, getColor().name());
+            IModel key = PersonManager.get().getPerson().getBackpack().findByTypeAndColor(HitWord.KEY, getColor().name());
             if (key != null) {
                 if(keyColorNeededToOpen != null) {
                     if (key.getColor().name().equalsIgnoreCase(keyColorNeededToOpen)) {

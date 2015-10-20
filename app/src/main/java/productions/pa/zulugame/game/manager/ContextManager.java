@@ -1,5 +1,8 @@
 package productions.pa.zulugame.game.manager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import productions.pa.zulugame.game.models.IModel;
 import productions.pa.zulugame.game.models.items.Riddle;
 
@@ -25,6 +28,7 @@ public class ContextManager {
      * @param currentContext the current model, that the user is interacting with*/
     IModel currentContext ;
 
+    List<IModel> allExistingModels = new ArrayList<>();
     //  ============================================================
     //  CONSTRUCTOR ITEMS
     //  ============================================================
@@ -63,6 +67,27 @@ public class ContextManager {
             RiddleManager.get().setCurrentRiddle((Riddle) context);
         }
         currentContext = context;
+    }
+
+    public void registerModel(IModel model){
+        allExistingModels.add(model);
+    }
+
+    public IModel findById(int id){
+
+        IModel found = fastFind(id);
+        if(found != null) return found;
+
+        for(IModel model : allExistingModels){
+            if(model.getId() == id)return model;
+        }
+
+        return null;
+    }
+
+    private IModel fastFind(int id) {
+        if(allExistingModels.get(id).getId() == id)return allExistingModels.get(id);
+        return null;
     }
 
 

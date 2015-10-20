@@ -50,6 +50,7 @@ public class HitWord {
     public static final String ITEM = "item";
     public static final String KEY = "key";
     public static final String BACKPACK = "backpack";
+    public static final String BACKPACK_SHORT = "bp";
     public static final String BOTTLE = "bottle";
     public static final String RIDDLE = "riddle";
 
@@ -74,7 +75,7 @@ public class HitWord {
     };
 
     public static final String HITWORDS_ITEMS[] = {
-            ITEM,ITEMS,BOX, KEY, BACKPACK, BOTTLE,RIDDLE
+            ITEM,ITEMS,BOX, KEY, BACKPACK,BACKPACK_SHORT, BOTTLE,RIDDLE
     };
 
     public static HitWord findHitWord(String word){
@@ -146,6 +147,8 @@ public class HitWord {
 
         UNKNOWN,
         NOT_FOUND,
+
+        NUMBER,
 
         ANSWER
     }

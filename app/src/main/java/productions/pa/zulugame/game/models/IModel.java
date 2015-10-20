@@ -25,6 +25,10 @@ public interface IModel {
     String getDescription();
 
     /**
+     * @return name ,color and maybe some other attributes from childclasses*/
+    String getShortdescription();
+
+    /**
      * @return type of the model like: Key, Bottle (not-abstract classes)*/
     TYPE getType();
     /**
@@ -43,7 +47,14 @@ public interface IModel {
     List<IModel> getSubItems();
 
     /**
-     * Removes iteratively the item of the givem id*/
+     * Add the model and sets its parentIndex*/
+    boolean addModel(IModel item);
+
+    /**
+     * Searches iteratively the item of the given id*/
+    boolean findById(int Id);
+    /**
+     * Removes iteratively the item of the given id*/
     boolean removeItemById(int Id);
     /**
      * @return String that should be diplayed*/
@@ -53,6 +64,8 @@ public interface IModel {
     //  ------------------------------------------------------------
     //  STATIC FINAL FIELDS ( Constants for game , experimentally set)
     //  ------------------------------------------------------------
+
+    int NOT_A_NUMBER= -23423;
 
     int MAXIMUM_LIFE_PERSON = 100;
     int START_LIFE_PERSON = 64;
@@ -103,7 +116,8 @@ public interface IModel {
         GREEN,
         RED,
         YELLOW,
-        ORANGE;
+        ORANGE
+        ,PURPLE;
 
         public static COLOR getRandom(){
             return getRandom(COLOR.values());
@@ -145,6 +159,11 @@ public interface IModel {
             return  values[random];
         }
 
+        public static COLOR fromString(String doorColor) {
+
+            for(COLOR color: COLOR.values())if(color.name().equalsIgnoreCase(doorColor))return color;
+            return RED;
+        }
     }
 
 

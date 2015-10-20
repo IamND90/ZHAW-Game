@@ -44,11 +44,13 @@ public class Box extends AModel {
 
     public Box(List<AItem> containingItems) {
         super(TYPE.BOX, TYPE.STORAGE);
-        getSubItems().addAll(containingItems);
+        for(AItem item : containingItems){
+            addModel(item);
+        }
     }
 
     public Box addItem(IModel item) {
-        getSubItems().add(item);
+        addModel(item);
         return this;
     }
 
@@ -87,44 +89,41 @@ public class Box extends AModel {
         // Handle OPEN a box
         if (command.hasAttributeOf(HitWord.BOX)) {
             if (command.hasActionOf(HitWord.OPEN)) {
-                if (command.getPointer().equalsIgnoreCase(this.getColor().name())) {
-                    ContextManager.get().setCurrentContext(Box.this);
-                    if(!hasBeenOpenes){
-                        PersonManager.get().getPerson().appendLife(IModel.LIFE_USED_OPEN_BOX);
-                        hasBeenOpenes = true;
-                    }
-                    return new Answer("You opened the box:" + getDescription(), Answer.DECORATION.BOX_ITEMS);
+
+                ContextManager.get().setCurrentContext(Box.this);
+                if(!hasBeenOpenes){
+                    PersonManager.get().getPerson().appendLife(IModel.LIFE_USED_OPEN_BOX);
+                    hasBeenOpenes = true;
                 }
+                return new Answer("You opened the box:" + getDescription(), Answer.DECORATION.BOX_ITEMS);
+
             }
         }
 
-
         //  Needs to handle command ALL to take all items
         if (command.hasActionOf(HitWord.TAKE, HitWord.GET, HitWord.STORE)) {
-            Log.i(TAG, "Getting something out of the box");
+            Log.i(TAG, "Getting all items out of the box");
             Backpack backpack =PersonManager.get().getPerson().getBackpack();
 
             // TAKE ALL ITEMS
             if (command.getPointer().equalsIgnoreCase(HitWord.ALL)) {
+                answer = new Answer("Taking all items", Answer.DECORATION.ADDING);
                 for (int i = 0; i < getSubItems().size(); i++) {
-                    if(getSubItems().get(i).getGroup().equals(TYPE.ITEM)) {
 
-                        if(answer == null)
-                            answer = backpack.addItem(getSubItems().get(i));
-                        else
-                            answer.addMessage(backpack.addItem(getSubItems().get(i)).getMessage());
+                    answer.addMessage(backpack.addItem(getSubItems().get(i)).getMessage());
 
-                        if (!answer.getDecorationType().equals(Answer.DECORATION.FAIL)) {
-                            getSubItems().remove(i--);
-                        }else{
-                            break;
-                        }
+                    if (!answer.getDecorationType().equals(Answer.DECORATION.FAIL)) {
+                        getSubItems().remove(i--);
+                    }else{
+                        break;
                     }
+
                 }
                 return answer;
             }
 
         }
+
 
         return super.processCommand(command);
     }
