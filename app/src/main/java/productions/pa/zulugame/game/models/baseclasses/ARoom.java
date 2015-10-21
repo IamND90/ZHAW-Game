@@ -233,7 +233,7 @@ public abstract class ARoom extends APlace {
 
     @Override
     public String getDescription() {
-        String description = "\tThis room contains:";
+        String description = "Room ["+getName()+"]"+ "\n\tThis room contains:";
         for (IModel item : getSubItems()) {
             if (item.getType().equals(TYPE.BOX)) {
                 Box box = (Box) item;

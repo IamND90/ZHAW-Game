@@ -11,6 +11,7 @@ import productions.pa.zulugame.game.manager.PersonManager;
 import productions.pa.zulugame.game.manager.RiddleManager;
 import productions.pa.zulugame.game.manager.RoomManager;
 import productions.pa.zulugame.game.models.baseclasses.APlace;
+import productions.pa.zulugame.game.models.baseclasses.ARoom;
 import productions.pa.zulugame.game.parser.Answer;
 import productions.pa.zulugame.game.parser.Command;
 import productions.pa.zulugame.game.parser.HitWord;
@@ -268,7 +269,7 @@ public class Game {
         //TODO
         if (status == null || status.equals(GameStatus.NOT_STARTED))
             return MessageFactory.MESSAGE_ENTER_START;
-        APlace place = RoomManager.get().getCurrentPlace();
+        ARoom place = RoomManager.get().getCurrentPlace();
         if (place != null) {
             return place.getDescription();
         }

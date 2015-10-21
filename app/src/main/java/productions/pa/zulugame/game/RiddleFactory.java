@@ -1,4 +1,4 @@
-package productions.pa.zulugame.game.models.quests;
+package productions.pa.zulugame.game;
 
 import productions.pa.zulugame.game.models.baseclasses.IModel;
 import productions.pa.zulugame.game.models.items.Riddle;

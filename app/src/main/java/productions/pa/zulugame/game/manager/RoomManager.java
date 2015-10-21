@@ -13,7 +13,7 @@ import productions.pa.zulugame.game.models.places.CustomRoom;
 import productions.pa.zulugame.game.models.places.Door;
 import productions.pa.zulugame.game.models.places.RoomFinish;
 import productions.pa.zulugame.game.models.places.RoomStart;
-import productions.pa.zulugame.game.models.quests.RiddleFactory;
+import productions.pa.zulugame.game.RiddleFactory;
 import productions.pa.zulugame.game.parser.Answer;
 
 /**
