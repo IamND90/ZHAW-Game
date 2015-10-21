@@ -1,6 +1,7 @@
 package productions.pa.zulugame.game.models;
 
 import productions.pa.zulugame.game.Game;
+import productions.pa.zulugame.game.Statistic;
 import productions.pa.zulugame.game.models.baseclasses.AModel;
 import productions.pa.zulugame.game.models.items.Backpack;
 
@@ -46,7 +47,7 @@ public class Person extends AModel {
     public String getDescription() {
 
         String info = getName() + ", have " + lifeLeft + " life left.\n";
-        info += getBackpack().getDescription();
+        info += Statistic.getCurrent().getString();
 
         return info;
     }
@@ -56,6 +57,7 @@ public class Person extends AModel {
         return (Backpack) getSubItems().get(Backpack.PARENT_INDEX);
     }
 
+    public int getLifeLeft(){return lifeLeft;}
     /**
      * apppends / removes life from user and check if <=0 : GAME OVER
      * @return by how much life healed. If dead: life left(<=0)

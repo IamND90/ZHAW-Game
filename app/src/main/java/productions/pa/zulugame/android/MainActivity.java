@@ -5,27 +5,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import productions.pa.zulugame.R;
 import productions.pa.zulugame.game.Game;
-import productions.pa.zulugame.output.Printer;
+import productions.pa.zulugame.game.Printer;
 
+/**
+ * This is the android part
+ * onCreate is the first method that is calles, there we find our two views and create the game*/
 public class MainActivity extends AppCompatActivity {
-
-    static final String SHAREDPREFS  = "sprefs";
-    static final String BOOL_OPEN_DEBUG  = "debugopen";
 
     TextView textOutput;
     EditText textInput;
-
 
     Game myGame;
 
@@ -51,53 +46,33 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if( textInput.getText().toString().endsWith("\n")){
+                if (textInput.getText().toString().endsWith("\n")) {
                     handleInput();
                 }
             }
         });
 
         myGame = new Game(new Printer(textOutput));
-
-
     }
 
+    /**
+     * is triggered bu hitting the "esnter" on the keyboard
+     * passes the input to the game module*/
     private void handleInput() {
-        //Get the input string and ceck if its not empty
+
+        //  Get the input string and check if its not empty
         String text = textInput.getText().toString();
-        if(text.equals("\n")){
+        if (text.equals("\n")) {
             textInput.setText("");
             return;
         }
-        if(text.length() >= 2 &&text.endsWith("\n")) text = text.substring(0,text.length()-1);
+        //  remove empty line
+        if (text.length() >= 2 && text.endsWith("\n")) text = text.substring(0, text.length() - 1);
 
-        if(TextUtils.isEmpty(text)) return;
+        if (TextUtils.isEmpty(text)) return;
         textInput.setText("");
 
         myGame.onInputString(text);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
 }

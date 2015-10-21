@@ -50,38 +50,17 @@ public abstract class APlace extends AModel {
                 }
             }
         }
-        if (getType().equals(TYPE.DOOR)) {
-
-
-        }
         return null;
-    }
-
-    protected IModel findRoomByColor(String color) {
-        return findRoomByNameOrColor("", color);
     }
 
     protected IModel findRoomByName(String name) {
-        return findRoomByNameOrColor(name, "");
-    }
-
-    protected IModel findRoomByNameOrColor(String name, String color) {
-        if (getType().equals(TYPE.ROOM)) {
-            for (IModel model : linkedPlaces) {
-                Door door = (Door) model;
-                for (ARoom room : door.getNextPlaces()) {
-                    if (room.getName().equalsIgnoreCase(name) || room.getColor().name().equalsIgnoreCase(color))
-                        return room;
-                }
-            }
-        }
-        if (getType().equals(TYPE.ROOM)) {
-            for (IModel room : linkedPlaces) {
-                if (room.getName().equalsIgnoreCase(name) || room.getColor().name().equalsIgnoreCase(color))
-                    return room;
-            }
+        for (IModel model : linkedPlaces) {
+            Door door = (Door) model;
+            if(door.getNextPlace().getName().equalsIgnoreCase(name))return door.getNextPlace();
         }
         return null;
     }
+
+
 
 }

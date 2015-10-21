@@ -43,11 +43,10 @@ public class Box extends AModel {
         super(TYPE.BOX, TYPE.STORAGE);
     }
 
-    public Box(List<AItem> containingItems) {
+    public Box(COLOR color) {
         super(TYPE.BOX, TYPE.STORAGE);
-        for(AItem item : containingItems){
-            addModel(item);
-        }
+        setColor(color);
+
     }
 
     public Box addItem(IModel item) {
@@ -92,11 +91,19 @@ public class Box extends AModel {
             if (command.hasActionOf(HitWord.OPEN)) {
 
                 ContextManager.get().setCurrentContext(Box.this);
-                String message = "You opened the box ";
+                String message = "You opened the [" + getColor().name().toLowerCase() + "] box";
                 if(!hasBeenOpenes){
                     PersonManager.get().getPerson().appendLife(IModel.LIFE_USED_OPEN_BOX);
                     hasBeenOpenes = true;
-                    message += "and lost [" + IModel.LIFE_USED_OPEN_BOX + "] lifepoints:";
+                    //  Just some modified messages xD
+                    if(getSubItems().size() == 0){
+                        message += ".You just lost [" + IModel.LIFE_USED_OPEN_BOX + "] lifepoints\nfor nothing, this box ist empty!\nMUAHAHAHAHA you moron!!\nand by the way," +
+                                "\nyou have only [" + PersonManager.get().getPerson().getLifeLeft() + "] lifepoints left.\n";
+                    }
+                    else {
+                        message += " and lost [" + IModel.LIFE_USED_OPEN_BOX + "] lifepoints:\n" +
+                                "You have [" + PersonManager.get().getPerson().getLifeLeft() + "] lifepoints left.\n";
+                    }
                 }
                 return new Answer(message + getDescription(), Answer.DECORATION.BOX_ITEMS);
 
@@ -110,7 +117,7 @@ public class Box extends AModel {
 
             // TAKE ALL ITEMS
             if (command.getPointer().equalsIgnoreCase(HitWord.ALL)) {
-                answer = new Answer("Taking all items", Answer.DECORATION.ADDING);
+                answer = new Answer("Taking all items.", Answer.DECORATION.ADDING);
                 for (int i = 0; i < getSubItems().size(); i++) {
 
                     answer.addMessage(backpack.addItem(getSubItems().get(i)).getMessage());

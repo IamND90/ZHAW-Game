@@ -30,6 +30,7 @@ public class HitWord {
     public static final String DROP = "drop";
     public static final String REMOVE = "remove";
     public static final String USE = "use";
+    public static final String DRINK = "drink";
     public static final String GET = "get";
     public static final String SHOW = "show";
     public static final String STORE = "store";
@@ -62,7 +63,7 @@ public class HitWord {
     public static final String HITWORDS_ACTING[] = {
             GO,ENTER,OPEN,CLOSE, RETURN,TAKE,
             GET,USE,SHOW,STORE,DROP,
-            REMOVE
+            REMOVE,DRINK
     };
 
     public static final String HITWORDS_POINTERS[] = {

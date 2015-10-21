@@ -32,7 +32,7 @@ public interface IModel {
      * @return type of the model like: Key, Bottle (not-abstract classes)*/
     TYPE getType();
     /**
-     * @return name of the model like: Item,Place (abstract classes), the group can be also the same like the type*/
+     * @return group of the model like: Item,Place (abstract classes), the group can be also the same like the type*/
     TYPE getGroup();
 
     /**
@@ -126,27 +126,23 @@ public interface IModel {
         public static COLOR getRandomExclude(COLOR... exclude){
 
             if(exclude.length >= COLOR.values().length){
-                Log.e("IModel","Trying to create more colors that you have!");
+                Log.e("IModel","Trying to create more colors than you have!");
                 return  getRandom();
             }
 
-            COLOR list[] = new COLOR[COLOR.values().length-exclude.length];
-
-            boolean hasColor;
-            int listIndex = 0;
-            for(int i =0 ; i < COLOR.values().length; i++){
-                hasColor = false;
-                list[listIndex] = ORANGE;
-                for(COLOR color: exclude){
-                    if(color.equals(COLOR.values()[i])){
-                        hasColor = true;
-                        break;
+            for(COLOR color : COLOR.values()){
+                boolean isFree;
+                for(COLOR excl : exclude){
+                    isFree = false;
+                    if(!excl.equals(color)){
+                        isFree = true;
                     }
+                    if(isFree) return color;
                 }
-                if(!hasColor)list[listIndex++] = COLOR.values()[i];
+
             }
 
-            return getRandom(list);
+            return COLOR.RED;
         }
 
         private static COLOR getRandom(COLOR[] values){

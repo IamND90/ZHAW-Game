@@ -1,4 +1,4 @@
-package productions.pa.zulugame.android;
+package productions.pa.zulugame.game;
 
 import android.content.Context;
 

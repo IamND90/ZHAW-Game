@@ -78,22 +78,7 @@ public class Door extends APlace {
         return "This Door links room [" + linkedPlaces.get(0).getName() + "] and [" + linkedPlaces.get(1).getName() + "]";
     }
 
-    /**
-     * Here are being handled the alternative functions of a command , for more information
-     * goto base-function @AModel (super.processCommand)
-     */
-    @Override
-    public Answer processCommand(Command command) {
-        if (command.hasActionOf(HitWord.OPEN)) {
-            if (command.getAttribute().equalsIgnoreCase(HitWord.DOOR)) {
-                IModel room = findRoomByColor(command.getPointer());
-                if (room != null) {
-                    return room.processCommand(command);
-                }
-            }
-        }
-        return null;
-    }
+
     // =============================================================
     //  PUBLIC METHODS
     //  ============================================================

@@ -1,10 +1,9 @@
-package productions.pa.zulugame.output;
+package productions.pa.zulugame.game;
 
 import android.content.Context;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import productions.pa.zulugame.android.UIHandler;
 import productions.pa.zulugame.game.manager.PersonManager;
 import productions.pa.zulugame.game.parser.Answer;
 
@@ -95,8 +94,8 @@ public class Printer implements UIHandler{
             currentText = currentText.substring((int) (total*0.3),total);
         }
 
-        //text = text.replaceAll("\n","");
-        currentText = currentText+"\n"+ text + "\n";
+        //  Add to last text and make a new line
+        currentText = currentText+"\n"+ text ;
 
         // Add text to UI
         outputView.setText(currentText);

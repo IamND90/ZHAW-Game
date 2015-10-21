@@ -61,7 +61,7 @@ public class RoomManager {
     final Box BOX6;
     final Box BOX7;
     final Box BOX8;
-    final Box BOX_EMPTY;
+
     //  ------------------------------------------------------------
     //  FIELDS
     //  ------------------------------------------------------------
@@ -87,7 +87,7 @@ public class RoomManager {
         KEY_GREEN = Key.generateKey(IModel.COLOR.GREEN);
         KEY_ORANGE = Key.generateKey(IModel.COLOR.ORANGE);
 
-        BOX_EMPTY = new Box();
+
         BOX0 = new Box()
                 .addItem(KEY_RED)
                 .addItem(RiddleFactory.get1_1());
@@ -122,26 +122,27 @@ public class RoomManager {
 
         START = new RoomStart()
                 .addBoxItem(BOX0);
-        ROOM1 = new CustomRoom("Nibula")
+        ROOM1 = new CustomRoom("Crux")
                 .addBoxItem(BOX1);
-        ROOM2 = new CustomRoom("Jutenheim")
+        ROOM2 = new CustomRoom("Lyra")
                 .addBoxItem(BOX2);
-        ROOM3 = new CustomRoom("Canyon")
-                .addBoxItem(new Box())
+        ROOM3 = new CustomRoom("Taurus")
+                .addBoxItem(new Box(IModel.COLOR.getRandomExclude(BOX3.getColor())))
                 .addBoxItem(BOX3);
-        ROOM4 = new CustomRoom("Disneyland")
+        ROOM4 = new CustomRoom("Anromeda")
                 .addBoxItem(BOX4)
                 .addBoxItem(BOX5);
-        ROOM5 = new CustomRoom("Rainbowworld")
+        ROOM5 = new CustomRoom("Virgo")
                 .addBoxItem(BOX6);
-        ROOM6 = new CustomRoom("Altron")
-                .addBoxItem(new Box())
+        ROOM6 = new CustomRoom("Cygnus")
+                .addBoxItem(new Box(IModel.COLOR.getRandomExclude(BOX7.getColor())))
                 .addBoxItem(BOX7);
-        ROOM7 = new CustomRoom("Uranus")
+        ROOM7 = new CustomRoom("Taurus")
                 .addBoxItem(BOX8);
         FINISH = new RoomFinish();
 
         createTree();
+        //  Set the first level
         roomsWalkLine.add(START);
     }
 
@@ -227,8 +228,10 @@ public class RoomManager {
         //  set this place to discovered
         getCurrentPlace().setIsDiscovered(true);
 
-        return new Answer("Moving from [" + currentPlace.getName() + "] to ["
-                + place.getName() + "] and lost [" + IModel.LIFE_USED_MOVE_BETWEEN_ROOMS + "] life."
+        return new Answer("Moving\nfrom [" + currentPlace.getName() + "] \nto ["
+                + place.getName() + "] and lost [" + IModel.LIFE_USED_MOVE_BETWEEN_ROOMS + "] life.\n"+
+                "You have [" + PersonManager.get().getPerson().getLifeLeft() + "] life left.\n"+
+                place.getDescription()
                 , Answer.DECORATION.ROOM_DESCRIPTION);
     }
 

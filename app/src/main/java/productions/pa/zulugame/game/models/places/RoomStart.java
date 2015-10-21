@@ -1,5 +1,6 @@
 package productions.pa.zulugame.game.models.places;
 
+import productions.pa.zulugame.game.Game;
 import productions.pa.zulugame.game.models.baseclasses.ARoom;
 import productions.pa.zulugame.game.manager.PersonManager;
 
@@ -13,16 +14,17 @@ public class RoomStart extends ARoom {
     boolean isFirstTimeShower = true;
     private static final String STORY =
                             "Hello " + PersonManager.get().getPerson().getName() +
-                                    ",\nWelcome to the game.\n"+
-                                    "Type 'help for help or 'info' to look around.\n"+
-                                    "To fill up health, use bottles or solve riddles.\n"+
-                                    "Moving or opening boxes costs you health.\n"+
-                                    "There are a lot more commands.Try it out!";
+                                    ",\nWelcome to {" + Game.GAME_NAME+
+                                    "}\n"+
+                                    "-Type 'help for help or 'info' to look around.\n"+
+                                    "-To fill up health, use bottles or solve riddles.\n"+
+                                    "-Moving or opening boxes costs you health.\n"+
+                                    "-There are a lot more commands.Try it out!\n------------------------------\n";
 
 
     public RoomStart(){
         super();
-        roomName ="Start";
+        roomName ="Gamestart";
         setIsDiscovered(true);
     }
 

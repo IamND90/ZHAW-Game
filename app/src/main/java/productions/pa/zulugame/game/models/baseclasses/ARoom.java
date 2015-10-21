@@ -191,7 +191,7 @@ public abstract class ARoom extends APlace {
             // OPEN THE DOOR
             if (command.hasAttributeOf(HitWord.DOOR)) {
                 Door door;
-                if(command.hasPointer() && linkedPlaces.size() > 1) {
+                if(!command.hasPointer() && linkedPlaces.size() > 1) {
                     return new Answer("Multiple items found, please specify color.", Answer.DECORATION.FAIL);
                 }
                 else if(command.hasPointer()){
@@ -213,26 +213,11 @@ public abstract class ARoom extends APlace {
                 }
                 return new Answer("No [" + command.getPointer() + "] door in this room!", Answer.DECORATION.FAIL);
             }
-
-
-            // ENTER A ROOM BY COLOR
-            if (command.hasAttributeOf(HitWord.ROOM)) {
-                ARoom room = (ARoom) findRoomByNameOrColor(command.getAttribute(), command.getPointer());
-                if (room != null) {
-                    if (room.openRoom(this)) {
-
-                        return moveTo(room);
-                    } else
-                        return new Answer(MessageFactory.MESSAGE_NO_KEY, Answer.DECORATION.ERROR);
-                }
-                return new Answer("No [" + command.getPointer() + "] room is next to you!", Answer.DECORATION.ERROR);
-            }
-
         }
 
-        //  Other possibilietires to  move between rooms
+        //  Other possibilietires to  move between rooms by name
         if (command.hasActionOf(HitWord.GO, HitWord.GOTO)) {
-            ARoom room = (ARoom) findRoomByNameOrColor(command.getAttribute(), command.getPointer());
+            ARoom room = (ARoom) findRoomByName(command.getAttribute());
             if (room != null) {
                 if (room.openRoom(this)) {
                     return moveTo(room);
@@ -245,9 +230,6 @@ public abstract class ARoom extends APlace {
         Log.i(TAG, "No suitable command found, checking subModels");
         return super.processCommand(command);
     }
-
-
-
 
     @Override
     public String getDescription() {

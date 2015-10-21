@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.util.Random;
 
+import productions.pa.zulugame.game.manager.ContextManager;
 import productions.pa.zulugame.game.manager.PersonManager;
 import productions.pa.zulugame.game.models.baseclasses.AItem;
 import productions.pa.zulugame.game.parser.Answer;
@@ -40,9 +41,8 @@ public class Bottle extends AItem {
 
     public Bottle() {
         super(TYPE.BOTTLE);
-        lifeLeft = Math.abs(new Random().nextInt()) % MAXIMUM_LIFE_BOTTLE;
-        Log.i("Bottle","Random:" + lifeLeft);
-        if (lifeLeft < MINIMUM_LIFE_BOTTLE) lifeLeft = MINIMUM_LIFE_BOTTLE;
+        lifeLeft = MINIMUM_LIFE_BOTTLE + Math.abs(new Random().nextInt()) % (MAXIMUM_LIFE_BOTTLE-MINIMUM_LIFE_BOTTLE);
+        Log.i("Bottle","Random life :" + lifeLeft);
         fullLife = lifeLeft;
         spaceUsed = SPACE_BOTTLE;
     }
@@ -68,7 +68,7 @@ public class Bottle extends AItem {
     @Override
     public Answer processCommand(Command command) {
         if(command.hasAttributeOf(getName(),getType().name())) {
-            if (command.hasActionOf(HitWord.USE)) {
+            if (command.hasActionOf(HitWord.USE,HitWord.DRINK)) {
                 if (lifeLeft <= 0) {
                     return new Answer("Bottle is empty", Answer.DECORATION.FAIL);
                 }
@@ -77,6 +77,10 @@ public class Bottle extends AItem {
                     //  Set new life munt in bottle
                     lifeLeft -= healedBy;
                     return new Answer("Your life is full", Answer.DECORATION.SIMPLE);
+                }
+                if(healedBy == lifeLeft){
+                    //  Remove bottle if its empty
+                    ContextManager.get().getCurrentcontext().removeItemById(getId());
                 }
                 return new Answer("Your life has been increased by " + healedBy, Answer.DECORATION.SIMPLE);
             }
